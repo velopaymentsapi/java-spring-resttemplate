@@ -5,6 +5,7 @@ import com.velopayments.oa3.client.ApiClient;
 import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.SupportedCountriesResponse;
 import com.velopayments.oa3.services.VeloApiTokenService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,5 +46,29 @@ public class AuthTest extends BaseApiTest{
         assertNotNull(supportedCountriesResponse);
 
         System.out.println(supportedCountriesResponse.getCountries());
+    }
+
+    @Disabled
+    @Test
+    void testGetAuthSecondToken()  {
+
+        String token = veloApiTokenService.getToken();
+
+        assertNotNull(token);
+
+        ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
+        apiClient.setAccessToken(token);
+
+        CountriesApi countriesApi = new CountriesApi(apiClient);
+
+        SupportedCountriesResponse supportedCountriesResponse = countriesApi.listSupportedCountries();
+
+        assertNotNull(supportedCountriesResponse);
+
+        veloApiTokenService.getToken(); // get second token
+
+        //make call with 1st token
+        System.out.println("Calling with first token");
+        supportedCountriesResponse = countriesApi.listSupportedCountries(); //goes boom
     }
 }

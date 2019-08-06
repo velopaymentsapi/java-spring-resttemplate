@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseApiTest {
 
     @Autowired
-    ApiClient apiClient;
+    public ApiClient apiClient;
 
     @Autowired
-    VeloAuthProperties veloAuthProperties;
+    public VeloAuthProperties veloAuthProperties;
 
     @Autowired
-    ObjectMapper objectMapper;
+    public VeloAPIProperties veloAPIProperties;
+
+    @Autowired
+    public ObjectMapper objectMapper;
 
 }

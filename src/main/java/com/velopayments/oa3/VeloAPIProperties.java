@@ -20,15 +20,19 @@ package com.velopayments.oa3;
 
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class VeloAPIProperties {
 
     private final String baseUrl;
     private final String payorId;
+    private final UUID payorIdUuid;
 
     public VeloAPIProperties(String baseUrl, String payorId) {
         this.baseUrl = baseUrl;
         this.payorId = payorId;
+        this.payorIdUuid = UUID.fromString(payorId);
     }
 
     public static final String AUTH_URL = "/v1/authenticate";
