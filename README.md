@@ -16,6 +16,7 @@ See the [Spring Boot documentation](https://docs.spring.io/spring-boot/docs/curr
 ## SDK Properties
 ### Velo API Properties  
 The following properties must be supplied for the SDK to function properly. 
+
 | Property | Description | 
 | -------- | ----------- |
 | velo.api.apikey | Your API Key. |
