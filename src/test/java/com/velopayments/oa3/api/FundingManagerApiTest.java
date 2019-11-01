@@ -92,20 +92,8 @@ public class FundingManagerApiTest extends BaseApiTest {
 
     }
 
-    @Test
-    void setPayorFundingBankDetailsTest() {
-        PayorFundingBankDetailsUpdate update = new PayorFundingBankDetailsUpdate();
-        update.setAccountName("VELO_FBO_BOFA_USD");
-        update.setAccountNumber("123123123212");
-        update.setRoutingNumber("123456789");
-
-        fundingManagerApi.setPayorFundingBankDetails(veloAPIProperties.getPayorIdUuid(), update);
-    }
-
     private UUID getSourceAccountUuid(UUID payorIdUuid) {
         ListSourceAccountResponse listSourceAccountResponse = fundingManagerApi.getSourceAccounts(null, payorIdUuid, 1, 25, null);
         return listSourceAccountResponse.getContent().get(0).getId();
     }
-
-
 }
