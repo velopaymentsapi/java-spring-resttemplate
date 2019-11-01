@@ -16,7 +16,7 @@ public class VeloApiTokenService {
 
     private final AuthApi authApi;
 
-    @Cacheable("veloAuthTokenCache")
+    @Cacheable(value = "veloAuthTokenCache", sync = true)
     public String getToken() {
         log.debug("Calling Auth API");
         AuthResponse response = authApi.veloAuth("client_credentials");
