@@ -24,14 +24,14 @@ public class FundingManagerApiTest extends BaseApiTest {
 
     @Test
     void testGetFundings() {
-        GetFundingsResponse response = fundingManagerApi.getFundings(veloAPIProperties.getPayorIdUuid(), 1, 2, null);
+        GetFundingsResponse response = fundingManagerApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), 1, 2, null);
 
         assertNotNull(response);
     }
 
     @Test
     void getSourceAccountsTest() {
-        ListSourceAccountResponseV2 response = fundingManagerApi.getSourceAccountsV2(null, veloAPIProperties.getPayorIdUuid(), 1, 25, null);
+        ListSourceAccountResponseV2 response = fundingManagerApi.getSourceAccountsV2(null, null, veloAPIProperties.getPayorIdUuid(), null,1, 25, null);
         assertNotNull(response);
         assertThat(response.getContent().size()).isGreaterThan(0);
     }

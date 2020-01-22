@@ -27,7 +27,7 @@ public class GetPayoutApiTest extends BaseApiTest {
     @Test
     void getPayoutsForPayorTest() {
 
-        GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayor(veloAPIProperties.getPayorIdUuid(),
+        GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(),
                 null, null, null, null, null, null, null);
 
         assertNotNull(getPayoutsResponseV3);
@@ -36,7 +36,7 @@ public class GetPayoutApiTest extends BaseApiTest {
     @Test
     void getPayoutTest() {
 
-        GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayor(veloAPIProperties.getPayorIdUuid(),
+        GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(),
                 null, null, null, null, null, null, null);
 
         PayoutSummaryAuditV3 payoutSummaryAuditV3 = getPayoutsResponseV3.getContent().get(0);
