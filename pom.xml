@@ -61,7 +61,7 @@
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <jackson-version>[2.10.1,)</jackson-version>
         <swagger-annotations-version>1.6.0</swagger-annotations-version>
-        <spring_boot.version>2.2.2.RELEASE</spring_boot.version>
+        <spring_boot.version>2.2.4.RELEASE</spring_boot.version>
     </properties>
 
     <dependencies>
@@ -142,12 +142,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring_boot.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.0.2</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -156,24 +157,6 @@
             <version>3.9</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.junit.jupiter</groupId>-->
-<!--            <artifactId>junit-jupiter</artifactId>-->
-<!--            <version>${junit-platform.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.mockito</groupId>-->
-<!--            <artifactId>mockito-core</artifactId>-->
-<!--            <version>${mockito.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.mockito</groupId>-->
-<!--            <artifactId>mockito-junit-jupiter</artifactId>-->
-<!--            <version>${mockito.version}</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -203,7 +186,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/gh-pages/branch/v2.19/openapi.json</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/gh-pages/openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <library>resttemplate</library>
 
@@ -212,8 +195,6 @@
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>
-<!--                            <generateSupportingFiles>false</generateSupportingFiles>-->
-
                             <groupId>${project.groupId}</groupId>
                             <artifactVersion>${project.version}</artifactVersion>
 
