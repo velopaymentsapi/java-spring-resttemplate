@@ -95,6 +95,28 @@ public class PayorApiTest {
         assertEquals(201, createResponse.getStatusCode().value());
     }
 
+    @DisplayName("Test Reminder Email Opt-Out - True")
+    @Test
+    void testReminderEmailOptOutTrue() {
+        PayorEmailOptOutRequest request = new PayorEmailOptOutRequest();
+        request.setReminderEmailsOptOut(true);
+
+        ResponseEntity<Void> responseEntity = payorsApi.payorEmailOptOutWithHttpInfo(veloAPIProperties.getPayorIdUuid(), request);
+
+        assertEquals(202, responseEntity.getStatusCode().value());
+    }
+
+    @DisplayName("Test Reminder Email Opt-Out - False")
+    @Test
+    void testReminderEmailOptOutFalse() {
+        PayorEmailOptOutRequest request = new PayorEmailOptOutRequest();
+        request.setReminderEmailsOptOut(false);
+
+        ResponseEntity<Void> responseEntity = payorsApi.payorEmailOptOutWithHttpInfo(veloAPIProperties.getPayorIdUuid(), request);
+
+        assertEquals(202, responseEntity.getStatusCode().value());
+    }
+
     @Disabled //currently failing
     @DisplayName("Test Create Application Key")
     @Test
