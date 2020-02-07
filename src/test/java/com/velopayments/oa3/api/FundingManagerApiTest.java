@@ -1,7 +1,6 @@
 package com.velopayments.oa3.api;
 
 import com.velopayments.oa3.BaseApiTest;
-import com.velopayments.oa3.VeloAPIProperties;
 import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.*;
 import org.junit.jupiter.api.Disabled;
@@ -96,37 +95,45 @@ public class FundingManagerApiTest extends BaseApiTest {
 
     }
 
-    @Disabled
-    @DisplayName("Test Get Funding Accounts - sensitive false")
+    @DisplayName("Test Get Funding Accounts by Source Account - sensitive false")
     @Test
-    void testGetFundingAccountsSenFalse() {
+    void testGetFundingAccountsBySourceSenFalse() {
         UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
 
-        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(veloAPIProperties.getPayorIdUuid(), sourceAccount, null, null, null, false);
+        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(null, sourceAccount, null, null, null, false);
 
         assertNotNull(fundingAccountsResponse);
         assertThat(fundingAccountsResponse.getContent().size()).isGreaterThan(0);
     }
 
-    @Disabled
+    @DisplayName("Test Get Funding Accounts by PayorId - sensitive false")
+    @Test
+    void testGetFundingAccountsByPayorIdeSenFalse() {
+        UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
+
+        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(veloAPIProperties.getPayorIdUuid(), null, null, null, null, false);
+
+        assertNotNull(fundingAccountsResponse);
+        assertThat(fundingAccountsResponse.getContent().size()).isGreaterThan(0);
+    }
+
     @DisplayName("Test Get Funding Accounts - sensitive true")
     @Test
     void testGetFundingAccountsSenTrue() {
         UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
 
-        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(veloAPIProperties.getPayorIdUuid(), sourceAccount, null, null, null, true);
+        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(null, sourceAccount, null, null, null, true);
 
         assertNotNull(fundingAccountsResponse);
         assertThat(fundingAccountsResponse.getContent().size()).isGreaterThan(0);
     }
 
-    @Disabled
     @DisplayName("Test Get Funding Account - sensitive false")
     @Test
     void testGetFundingAccountSenFalse() {
         UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
 
-        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(veloAPIProperties.getPayorIdUuid(), sourceAccount, null, null, null, false);
+        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(null, sourceAccount, null, null, null, false);
 
         assertNotNull(fundingAccountsResponse);
 
@@ -137,13 +144,12 @@ public class FundingManagerApiTest extends BaseApiTest {
         assertNotNull(response);
     }
 
-    @Disabled
     @DisplayName("Test Get Funding Account - sensitive true")
     @Test
     void testGetFundingAccountSenTrue() {
         UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
 
-        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(veloAPIProperties.getPayorIdUuid(), sourceAccount, null, null, null, false);
+        ListFundingAccountsResponse fundingAccountsResponse = fundingManagerApi.getFundingAccounts(null, sourceAccount, null, null, null, false);
 
         assertNotNull(fundingAccountsResponse);
 
