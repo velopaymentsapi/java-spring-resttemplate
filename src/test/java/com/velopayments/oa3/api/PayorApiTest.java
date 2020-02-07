@@ -16,7 +16,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.StringTokenizer;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
