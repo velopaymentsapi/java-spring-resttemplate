@@ -168,7 +168,7 @@ public class FundingManagerApiTest extends BaseApiTest {
         assertNotNull(response);
     }
 
-    @Disabled //OA3 spec incorrect for response type See MVP-9121
+    @Disabled("OA3 spec incorrect for response type See MVP-9121")
     @DisplayName("Test Get Funding Audit Delta")
     @Test
     void testGetFundingAuditDelta() {
