@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -159,6 +160,21 @@ public class FundingManagerApiTest extends BaseApiTest {
         GetFundingsResponse response = fundingManagerApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), 1, 2, null);
 
         assertNotNull(response);
+    }
+
+    @Disabled //OA3 spec incorrect for response type See MVP-9121
+    @DisplayName("Test Get Funding Audit Delta")
+    @Test
+    void testGetFundingAuditDelta() {
+
+        OffsetDateTime dateTime = OffsetDateTime.now().minusYears(2);
+
+        PageResourceFundingPayorStatusAuditResponseFundingPayorStatusAuditResponse response =
+                fundingManagerApi.listFundingAuditDeltas(veloAPIProperties.getPayorIdUuid(), dateTime, null, null);
+
+        assertNotNull(response);
+
+        assertThat(response.getContent().size()).isGreaterThan(0);
     }
 
     private UUID getSourceAccountUuid(UUID payorIdUuid) {
