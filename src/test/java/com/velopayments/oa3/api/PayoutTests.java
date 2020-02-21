@@ -60,7 +60,7 @@ public class PayoutTests {
         assertNotNull(getUUIDFromPayoutLocation(location));
     }
 
-    @Disabled("TODO - ADD MVP")
+    @Disabled("See: MVP-9234")
     @Test
     void testGetPayout()  {
         UUID payoutId = getUUIDFromPayoutLocation(submitPayout());
@@ -82,7 +82,7 @@ public class PayoutTests {
         return getPayoutApi.v3PayoutsPayoutIdGet(UUID.fromString(payoutId));
     }
 
-    @Disabled("TODO - ADD MVP")
+    @Disabled("See: MVP-9234")
     @Test
     void testWithDrawlPayout() throws InterruptedException {
         URI location = submitPayout();
