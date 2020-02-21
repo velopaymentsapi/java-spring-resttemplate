@@ -1,17 +1,16 @@
 package com.velopayments.oa3.config;
 
 import com.velopayments.oa3.VeloAPIProperties;
-import com.velopayments.oa3.VeloAuthProperties;
 import com.velopayments.oa3.api.*;
 import com.velopayments.oa3.client.ApiClient;
 import com.velopayments.oa3.services.VeloApiTokenService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.*;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -21,22 +20,46 @@ import java.util.UUID;
     excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ApiClient.class)})
 public class VeloConfig {
 
-    @Bean
-    VeloAPIProperties veloAPIProperties(@Value("${velo.base.url}") String baseUrl,
-                                        @Value("${velo.api.payorid}") String payorId){
-        return new VeloAPIProperties(baseUrl, payorId);
-    }
+    public static final String VELO_API_APIKEY = "VELO_API_APIKEY";
+    public static final String VELO_API_APISECRET = "VELO_API_APISECRET";
+    public static final String VELO_API_PAYORID = "VELO_API_PAYORID";
+    public static final String VELO_BASE_URL = "VELO_BASE_URL";
 
+
+    /**
+     * Set these configuration values in system or environment variables.
+     *
+     * @return
+     */
     @Bean
-    VeloAuthProperties veloAuthProperties(@Value("${velo.api.payorid}") String payorId,
-                                          @Value("${velo.api.apikey}") String apiKey,
-                                          @Value("${velo.api.apisecret}") String apiSecret) {
-        return VeloAuthProperties
-                .builder()
-                .payorId(UUID.fromString(payorId))
-                .apiKey(UUID.fromString(apiKey))
-                .apiSecretKey(UUID.fromString(apiSecret))
-                .build();
+    VeloAPIProperties veloAPIProperties(){
+        VeloAPIProperties veloAPIProperties = new VeloAPIProperties();
+
+        if (!StringUtils.isEmpty(System.getProperty(VELO_BASE_URL))) {
+            veloAPIProperties.setBaseUrl(System.getProperty(VELO_BASE_URL));
+        } else if (!StringUtils.isEmpty(System.getenv(VELO_BASE_URL))) {
+            veloAPIProperties.setBaseUrl(System.getenv(VELO_BASE_URL));
+        }
+
+        if (!StringUtils.isEmpty(System.getProperty(VELO_API_PAYORID))) {
+            veloAPIProperties.setPayorId(System.getProperty(VELO_API_PAYORID));
+        } else if (!StringUtils.isEmpty(System.getenv(VELO_API_PAYORID))) {
+            veloAPIProperties.setPayorId(System.getenv(VELO_API_PAYORID));
+        }
+
+        if (!StringUtils.isEmpty(System.getProperty(VELO_API_APIKEY))) {
+            veloAPIProperties.setApiKey(UUID.fromString(System.getProperty(VELO_API_APIKEY)));
+        } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APIKEY)))) {
+            veloAPIProperties.setApiKey(UUID.fromString(System.getenv(VELO_API_APIKEY)));
+        }
+
+        if (!StringUtils.isEmpty(System.getProperty(VELO_API_APISECRET))) {
+            veloAPIProperties.setApiSecret(UUID.fromString(System.getProperty(VELO_API_APISECRET)));
+        } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APISECRET)))) {
+            veloAPIProperties.setApiSecret(UUID.fromString(System.getenv(VELO_API_APISECRET)));
+        }
+
+        return veloAPIProperties;
     }
 
     @Bean
@@ -55,10 +78,10 @@ public class VeloConfig {
     }
 
     @Bean("authApiClient")
-    public ApiClient authApiClient(RestTemplateBuilder restTemplateBuilder, VeloAuthProperties veloAuthProperties){
+    public ApiClient authApiClient(RestTemplateBuilder restTemplateBuilder, VeloAPIProperties veloAPIProperties){
         ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
-        apiClient.setUsername(veloAuthProperties.getApiKey().toString());
-        apiClient.setPassword(veloAuthProperties.getApiSecretKey().toString());
+        apiClient.setUsername(veloAPIProperties.getApiKey().toString());
+        apiClient.setPassword(veloAPIProperties.getApiSecret().toString());
         return apiClient;
     }
 

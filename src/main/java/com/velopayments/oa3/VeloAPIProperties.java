@@ -19,18 +19,25 @@
 package com.velopayments.oa3;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
+
+/**
+ * POJO for holding Velo API Properties. This bean is added to the Spring Context in the VeloConfig configuration bean.
+ */
+@Setter
 @Getter
 public class VeloAPIProperties {
 
-    private final String baseUrl;
-    private final String payorId;
-    private final UUID payorIdUuid;
+    private  String baseUrl;
+    private  String payorId;
+    private  UUID payorIdUuid;
+    private  UUID apiKey;
+    private  UUID apiSecret;
 
-    public VeloAPIProperties(String baseUrl, String payorId) {
-        this.baseUrl = baseUrl;
+    public void setPayorId(String payorId) {
         this.payorId = payorId;
         this.payorIdUuid = UUID.fromString(payorId);
     }

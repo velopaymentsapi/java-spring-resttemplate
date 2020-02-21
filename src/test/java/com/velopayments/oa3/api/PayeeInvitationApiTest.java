@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -166,7 +165,10 @@ public class PayeeInvitationApiTest extends BaseApiTest {
 
         createPayee.setIndividual(createIndividual);
 
-        CreatePayeesCSVResponseV2 response = payeeInvitationApi.v2CreatePayee(createPayeesRequest);
+        ResponseEntity<CreatePayeesCSVResponseV2> response = payeeInvitationApi.v2CreatePayeeWithHttpInfo(createPayeesRequest);
+
+        assertNotNull(response);
+        assertNotNull(response.getHeaders().getLocation());
     }
 
     @Disabled
@@ -176,7 +178,10 @@ public class PayeeInvitationApiTest extends BaseApiTest {
 
     @Test
     void createPayee3Test() {
-          CreatePayeesCSVResponseV3 response = payeeInvitationApi.v3CreatePayee(buildCreatePayeeRequestV3());
+          ResponseEntity<CreatePayeesCSVResponseV3> response = payeeInvitationApi.v3CreatePayeeWithHttpInfo(buildCreatePayeeRequestV3());
+
+          assertNotNull(response);
+          assertNotNull(response.getHeaders().getLocation());
 
     }
 
