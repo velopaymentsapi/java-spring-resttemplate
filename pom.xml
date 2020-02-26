@@ -205,7 +205,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>4.2.2</version>
+                <version>4.2.3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -225,6 +225,7 @@
                             <artifactVersion>${project.version}</artifactVersion>
 
                             <configOptions>
+                                <additionalModelTypeAnnotations>@lombok.Builder @lombok.AllArgsConstructor @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
                                 <modelPackage>com.velopayments.oa3.model</modelPackage>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>

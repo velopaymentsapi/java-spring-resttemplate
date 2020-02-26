@@ -71,6 +71,46 @@ public class PayoutTests {
         System.out.println(summaryResponse.getStatus());
     }
 
+    @Disabled("See: MVP-9234")
+    @Test
+    void testWithDrawlPayout() {
+        URI location = submitPayout();
+        UUID payoutId = getUUIDFromPayoutLocation(location);
+
+        PayoutSummaryResponse summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
+
+        withdrawPayoutApi.v3PayoutsPayoutIdDelete(payoutId);
+    }
+
+    @Disabled("See: MVP-9234")
+    @Test
+    void testQuotePayout() {
+        URI location = submitPayout();
+        UUID payoutId = getUUIDFromPayoutLocation(location);
+
+        PayoutSummaryResponse summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
+
+        QuoteResponse quoteResponse = quotePayoutApi.v3PayoutsPayoutIdQuotePost(payoutId);
+
+        assertNotNull(quoteResponse);
+    }
+
+    @Disabled("See: MVP-9234")
+    @Test
+    void testInstructPayout() {
+        URI location = submitPayout();
+        UUID payoutId = getUUIDFromPayoutLocation(location);
+
+        PayoutSummaryResponse summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
+
+        QuoteResponse quoteResponse = quotePayoutApi.v3PayoutsPayoutIdQuotePost(payoutId);
+
+        ResponseEntity<Void> instructResponse = instructPayoutApi.v3PayoutsPayoutIdPostWithHttpInfo(payoutId);
+
+        assertNotNull(instructResponse);
+        assertThat(instructResponse.getStatusCode().value()).isEqualTo(202);
+    }
+
     PayoutSummaryResponse awaitPayoutStatus(String payoutId, String status){
         await().atMost(15, TimeUnit.SECONDS).pollInterval(500, TimeUnit.MILLISECONDS).untilAsserted(() -> {
             PayoutSummaryResponse summaryResponse = getPayoutApi.v3PayoutsPayoutIdGet(UUID.fromString(payoutId));
@@ -82,15 +122,6 @@ public class PayoutTests {
         return getPayoutApi.v3PayoutsPayoutIdGet(UUID.fromString(payoutId));
     }
 
-    @Disabled("See: MVP-9234")
-    @Test
-    void testWithDrawlPayout() throws InterruptedException {
-        URI location = submitPayout();
-        UUID payoutId = getUUIDFromPayoutLocation(location);
-    //    Thread.sleep(10000);
-        quotePayoutApi.v3PayoutsPayoutIdQuotePost(payoutId);
-        withdrawPayoutApi.v3PayoutsPayoutIdDelete(payoutId);
-    }
 
     private URI submitPayout(){
         CreatePayoutRequest createPayoutRequest = new CreatePayoutRequest();
@@ -131,8 +162,6 @@ public class PayoutTests {
     }
 
     private List<PayeeResponseV3> getOnboardedPayees(){
-//        PagedPayeeResponseV3 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), WatchlistStatusV3.PASSED, OnboardedStatus.ONBOARDED, null,
-//                null, null, null, null, null, 10, null);
 
         PagedPayeeResponseV3 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()),null, OnboardedStatus.ONBOARDED, null,
                 null, "john.thompson+payee1", null, null, null, 10, null);
