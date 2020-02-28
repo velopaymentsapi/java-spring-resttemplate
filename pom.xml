@@ -211,7 +211,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/2a5d69651a47be09c57980c2e3b975eaccdec1a4/spec/openapi.yaml</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/master/spec/openapi.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>resttemplate</library>
 
