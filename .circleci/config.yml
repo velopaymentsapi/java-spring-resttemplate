@@ -10,7 +10,7 @@ workflows:
         triggers:
             # Run Nightly at 3 am, only build master
             -   schedule:
-                    cron: "10 3 * * *"
+                    cron: "15 3 * * *"
                     filters:
                         branches:
                             only:
