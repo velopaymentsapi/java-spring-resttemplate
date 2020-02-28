@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/velopaymentsapi/java-spring-resttemplate/tree/v2.21.svg?style=svg)](https://circleci.com/gh/velopaymentsapi/java-spring-resttemplate/tree/v2.21)# Java Spring RestTemplate
+[![CircleCI](https://circleci.com/gh/velopaymentsapi/java-spring-resttemplate/tree/v2.22.svg?style=svg)](https://circleci.com/gh/velopaymentsapi/java-spring-resttemplate/tree/v2.22)
 
 The source code in this repository is generated from [Velo's OpenAPI specification](https://github.com/velopaymentsapi/VeloOpenApi).
 
