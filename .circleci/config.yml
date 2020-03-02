@@ -10,10 +10,10 @@ workflows:
         triggers:
             # Run Nightly at 3 am, only build master
             -   schedule:
-                    cron: "10 3 * * *"
+                    cron: "10 * * * *"
                     filters:
                         branches:
                             only:
-                                - master
+                                - v2.20
         jobs:
             - maven/test
