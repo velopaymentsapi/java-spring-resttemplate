@@ -6,7 +6,6 @@ import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -60,7 +59,6 @@ public class PayoutTests {
         assertNotNull(getUUIDFromPayoutLocation(location));
     }
 
-    @Disabled("See: MVP-9234")
     @Test
     void testGetPayout()  {
         UUID payoutId = getUUIDFromPayoutLocation(submitPayout());
@@ -71,7 +69,6 @@ public class PayoutTests {
         System.out.println(summaryResponse.getStatus());
     }
 
-    @Disabled("See: MVP-9234")
     @Test
     void testWithDrawlPayout() {
         URI location = submitPayout();
@@ -82,7 +79,6 @@ public class PayoutTests {
         withdrawPayoutApi.v3PayoutsPayoutIdDelete(payoutId);
     }
 
-    @Disabled("See: MVP-9234")
     @Test
     void testQuotePayout() {
         URI location = submitPayout();
@@ -95,7 +91,6 @@ public class PayoutTests {
         assertNotNull(quoteResponse);
     }
 
-    @Disabled("See: MVP-9234")
     @Test
     void testInstructPayout() {
         URI location = submitPayout();
