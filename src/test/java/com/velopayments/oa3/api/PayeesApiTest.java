@@ -202,8 +202,11 @@ public class PayeesApiTest {
         @Test
         void testUpdateRemoteIdV3() {
             PayeeResponse2 payeeResponseV3 = inviteNewPayee();
+            PayeeResponseV3 payee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            System.out.println(payee.toString());
+            assertThat(payee.getPayorRefs().size()).isGreaterThan(0);
 
-            //newRandom string
+            // newRandom string
             String randomString = RandomStringUtils.randomAlphabetic(10);
 
             UpdateRemoteIdRequest updateRemoteIdRequestV3 = new UpdateRemoteIdRequest();
@@ -213,6 +216,19 @@ public class PayeesApiTest {
             ResponseEntity<Void> responseEntity = payeesApi.v3PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponseV3.getPayeeId(), updateRemoteIdRequestV3);
 
             assertThat(responseEntity.getStatusCode().value()).isEqualTo(204);
+
+            PayeeResponseV3 updatedPayee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            assertThat(updatedPayee.getPayorRefs().size()).isGreaterThan(0);
+            updatedPayee.getPayorRefs().forEach(ref -> {
+                System.out.println(ref.getPayorId());
+                System.out.println(veloAPIProperties.getPayorIdUuid());
+
+                if(ref.getPayorId().equals(veloAPIProperties.getPayorIdUuid())){
+                    assertThat(ref.getRemoteId()).isEqualTo(randomString);
+                } else {
+                    assertThat(1).isEqualTo(3);
+                }
+            });
         }
 
         @DisplayName("Test Get Invitation Status")
