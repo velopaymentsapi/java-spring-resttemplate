@@ -3,6 +3,7 @@ package com.velopayments.oa3.config;
 import com.velopayments.oa3.VeloAPIProperties;
 import com.velopayments.oa3.api.*;
 import com.velopayments.oa3.client.ApiClient;
+import com.velopayments.oa3.client.ApiClientDecorator;
 import com.velopayments.oa3.services.VeloApiTokenService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.Cache;
@@ -24,7 +25,6 @@ public class VeloConfig {
     public static final String VELO_API_APISECRET = "VELO_API_APISECRET";
     public static final String VELO_API_PAYORID = "VELO_API_PAYORID";
     public static final String VELO_BASE_URL = "VELO_BASE_URL";
-
 
     /**
      * Set these configuration values in system or environment variables.
@@ -91,7 +91,7 @@ public class VeloConfig {
     }
 
     private ApiClient buildTokenApiClient(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
+        ApiClient apiClient = new ApiClientDecorator(restTemplateBuilder.build(), veloApiTokenService);
         apiClient.setAccessToken(veloApiTokenService.getToken());
         return apiClient;
     }
