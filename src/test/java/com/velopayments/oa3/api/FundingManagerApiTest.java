@@ -133,14 +133,6 @@ public class FundingManagerApiTest extends BaseApiTest {
             assertNotNull(response);
         }
 
-        @DisplayName("Test Get Fundings for Payor")
-        @Test
-        void testGetFundings() {
-            GetFundingsResponse response = fundingManagerApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), 1, 2, null);
-
-            assertNotNull(response);
-        }
-
         @Disabled("OA3 spec incorrect for response type See MVP-9121")
         @DisplayName("Test Get Funding Audit Delta")
         @Test

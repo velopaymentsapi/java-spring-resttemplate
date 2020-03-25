@@ -163,7 +163,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
 
         @Test
         void getPayeeInvitationStatusV3ByPayeeId() {
-            PagedPayeeResponse2 pagedPayeeResponseV3 = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null,
+            PagedPayeeResponse2 pagedPayeeResponseV3 = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
                     null, null, null, null, null, null, null);
 
             //get first payee id

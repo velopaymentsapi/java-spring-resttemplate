@@ -46,26 +46,6 @@ public class PaymentAuditServiceApiTest {
             assertThat(getPayoutStatistics.getThisMonthPayoutsCount()).isGreaterThan(0);
         }
 
-        @DisplayName("Test Get Fundings for Payor")
-        @Test
-        void testGetFundingsForPayor() {
-
-            GetFundingsResponse getFundingsResponse = paymentAuditServiceApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), null, null, null);
-
-            assertNotNull(getFundingsResponse);
-            assertThat(getFundingsResponse.getContent().size()).isGreaterThan(0);
-        }
-
-        @DisplayName("Test Get Fundings for Payor With Paging")
-        @Test
-        void testGetFundingsForPayorWithPaging() {
-
-            GetFundingsResponse getFundingsResponse = paymentAuditServiceApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), 2, 50, null);
-
-            assertNotNull(getFundingsResponse);
-            assertThat(getFundingsResponse.getContent().size()).isGreaterThan(0);
-        }
-
         @DisplayName("Test List Payment Changes")
         @Test
         void testListPaymentChanges() {
@@ -85,7 +65,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payouts for Payors")
         @Test
         void testGetPayoursForPayorV3() {
-            GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(), null, null,
+            GetPayoutsResponse getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null);
 
             assertNotNull(getPayoutsResponseV3);
@@ -96,13 +76,13 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payments for Payout")
         @Test
         void testGetPaymentsForPayoutV3() {
-            GetPayoutsResponseV3 getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(), null, "COMPLETED",
+            GetPayoutsResponse getPayoutsResponseV3 = paymentAuditServiceApi.getPayoutsForPayorV3(veloAPIProperties.getPayorIdUuid(), null, "COMPLETED",
                     null, null, null, null, null);
 
             assertNotNull(getPayoutsResponseV3);
-            PayoutSummaryAuditV3 payoutSummaryAuditV3 = getPayoutsResponseV3.getContent().get(0);
+            PayoutSummaryAudit payoutSummaryAuditV3 = getPayoutsResponseV3.getContent().get(0);
 
-            GetPaymentsForPayoutResponseV3 getPaymentsForPayoutResponseV3 = paymentAuditServiceApi.getPaymentsForPayout(payoutSummaryAuditV3.getPayoutId(), null, null, null,
+            GetPaymentsForPayoutResponse getPaymentsForPayoutResponseV3 = paymentAuditServiceApi.getPaymentsForPayout(payoutSummaryAuditV3.getPayoutId(), null, null, null,
                     null, null, null, null, null, null,
                     null, null, null);
 
@@ -135,9 +115,9 @@ public class PaymentAuditServiceApiTest {
 
             assertNotNull(listPaymentsResponse);
 
-            PaymentResponseV3 paymentResponseV3 = listPaymentsResponse.getContent().get(0);
+            PaymentResponse paymentResponseV3 = listPaymentsResponse.getContent().get(0);
 
-            PaymentResponseV3 paymentDetails = paymentAuditServiceApi.getPaymentDetails(paymentResponseV3.getPaymentId(), false);
+            PaymentResponse paymentDetails = paymentAuditServiceApi.getPaymentDetails(paymentResponseV3.getPaymentId(), false);
 
             assertNotNull(paymentDetails);
         }
@@ -149,7 +129,7 @@ public class PaymentAuditServiceApiTest {
             LocalDate startDate = LocalDate.now().minusMonths(2);
             LocalDate endDate = LocalDate.now();
 
-            PayorAmlTransactionV3 payorAmlTransactionV3 = paymentAuditServiceApi.exportTransactionsCSVV3(veloAPIProperties.getPayorIdUuid(),
+            PayorAmlTransaction payorAmlTransactionV3 = paymentAuditServiceApi.exportTransactionsCSVV3(veloAPIProperties.getPayorIdUuid(),
                     startDate, endDate);
 
             assertNotNull(payorAmlTransactionV3);
@@ -162,7 +142,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payouts for Payor")
         @Test
         void testGetPayoutsForPayorV4() {
-            GetPayoutsResponseV4 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, null,
+            GetPayoutsResponse2 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null, null);
 
             assertNotNull(getPayoutsResponseV4);
@@ -172,7 +152,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payouts for Payor - REJECTED")
         @Test
         void testGetPayoutsForPayorV4Rejected() {
-            GetPayoutsResponseV4 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "REJECTED",
+            GetPayoutsResponse2 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "REJECTED",
                     null, null, null, 1, 50, null);
 
             assertNotNull(getPayoutsResponseV4);
@@ -182,7 +162,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payouts for Payor - QUOTED")
         @Test
         void testGetPayoutsForPayorV4Quoted() {
-            GetPayoutsResponseV4 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "QUOTED",
+            GetPayoutsResponse2 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "QUOTED",
                     null, null, null, 1, 50, null);
 
             assertNotNull(getPayoutsResponseV4);
@@ -192,14 +172,14 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payments for Payout")
         @Test
         void testGetPaymentsForPayoutV4() {
-            GetPayoutsResponseV4 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "COMPLETED",
+            GetPayoutsResponse2 getPayoutsResponseV4 = paymentAuditServiceApi.getPayoutsForPayorV4(veloAPIProperties.getPayorIdUuid(), null, "COMPLETED",
                     null, null, null, null, null, null);
 
             assertNotNull(getPayoutsResponseV4);
 
-            PayoutSummaryAuditV4 payoutSummaryAuditV4 = getPayoutsResponseV4.getContent().get(0);
+            PayoutSummaryAudit2 payoutSummaryAuditV4 = getPayoutsResponseV4.getContent().get(0);
 
-            GetPaymentsForPayoutResponseV4 getPaymentsForPayoutResponseV4 = paymentAuditServiceApi.getPaymentsForPayoutV4(payoutSummaryAuditV4.getPayoutId(), null, null, null,
+            GetPaymentsForPayoutResponse2 getPaymentsForPayoutResponseV4 = paymentAuditServiceApi.getPaymentsForPayoutV4(payoutSummaryAuditV4.getPayoutId(), null, null, null,
                     null, null, null, null, null,
                     null, null, null, null);
 
@@ -210,7 +190,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get List of Payments")
         @Test
         void testGetListOfPaymentsV4() {
-            ListPaymentsResponseV4 listPaymentsResponseV4 = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null,
+            ListPaymentsResponse2 listPaymentsResponseV4 = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null,
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
@@ -223,7 +203,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payment")
         @Test
         void testGetPaymentV4() {
-            ListPaymentsResponseV4 listPaymentsResponseV4 = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null,
+            ListPaymentsResponse2 listPaymentsResponseV4 = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null,
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
@@ -231,9 +211,9 @@ public class PaymentAuditServiceApiTest {
 
             assertNotNull(listPaymentsResponseV4);
 
-            PaymentResponseV4 paymentResponseV4 = listPaymentsResponseV4.getContent().get(0);
+            PaymentResponse2 paymentResponseV4 = listPaymentsResponseV4.getContent().get(0);
 
-            PaymentResponseV4 responseV4 = paymentAuditServiceApi.getPaymentDetailsV4(paymentResponseV4.getPaymentId(), false);
+            PaymentResponse2 responseV4 = paymentAuditServiceApi.getPaymentDetailsV4(paymentResponseV4.getPaymentId(), false);
 
             assertNotNull(responseV4);
         }

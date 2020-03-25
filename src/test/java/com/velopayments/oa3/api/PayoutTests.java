@@ -158,7 +158,7 @@ public class PayoutTests {
 
     private List<PayeeResponse2> getOnboardedPayees(){
 
-        PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()),null, OnboardedStatus.ONBOARDED, null,
+        PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatus.ONBOARDED, null,
                 null, "john.thompson+payee1", null, null, null, 10, null);
 
         return response.getContent();
