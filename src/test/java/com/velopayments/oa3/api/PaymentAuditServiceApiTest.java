@@ -30,8 +30,6 @@ public class PaymentAuditServiceApiTest {
     @Autowired
     PaymentAuditServiceApi paymentAuditServiceApi;
 
-    @Autowired //todo - need to move these into Payment Audit
-    PayoutHistoryApi payoutHistoryApi;
 
     @DisplayName("V1")
     @Nested
@@ -40,7 +38,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Payout Statistics")
         @Test
         void testGetPayoutStats() {
-            GetPayoutStatistics getPayoutStatistics = payoutHistoryApi.getPayoutStatsV1(veloAPIProperties.getPayorIdUuid());
+            GetPayoutStatistics getPayoutStatistics = paymentAuditServiceApi.getPayoutStatsV1(veloAPIProperties.getPayorIdUuid());
 
             assertThat(getPayoutStatistics).isNotNull();
             assertThat(getPayoutStatistics.getThisMonthPayoutsCount()).isGreaterThan(0);

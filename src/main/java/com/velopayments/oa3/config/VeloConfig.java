@@ -140,12 +140,6 @@ public class VeloConfig {
 
     @Bean
     @Lazy
-    public PaymentAuditApi paymentAuditApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PaymentAuditApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
     public PaymentAuditServiceApi paymentAuditServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
         return new PaymentAuditServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
     }
@@ -155,12 +149,6 @@ public class VeloConfig {
     @Lazy
     public PayorsApi payorsApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
         return new PayorsApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public PayoutHistoryApi payoutHistoryApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PayoutHistoryApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
     }
 
     @Bean
