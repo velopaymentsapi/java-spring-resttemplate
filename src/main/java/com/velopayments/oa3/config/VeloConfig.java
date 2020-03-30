@@ -116,18 +116,6 @@ public class VeloConfig {
 
     @Bean
     @Lazy
-    public GetPayoutApi getPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new GetPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public InstructPayoutApi instructPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new InstructPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
     public PayeeInvitationApi payeeInvitationApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
         return new PayeeInvitationApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
     }
@@ -153,14 +141,8 @@ public class VeloConfig {
 
     @Bean
     @Lazy
-    public QuotePayoutApi quotePayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new QuotePayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public SubmitPayoutApi submitPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new SubmitPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PayoutServiceApi payoutServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
+        return new PayoutServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
     }
 
     @Bean
@@ -173,11 +155,5 @@ public class VeloConfig {
     @Lazy
     public UsersApi usersApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
         return new UsersApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public WithdrawPayoutApi withdrawPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new WithdrawPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
     }
 }
