@@ -39,7 +39,7 @@ public class CountriesApiTest extends BaseApiTest {
     @Test
     void v1PaymentChannelRulesGetTest() {
 
-        PaymentChannelRulesResponse response = countriesApi.v1PaymentChannelRulesGet();
+        PaymentChannelRulesResponse response = countriesApi.listPaymentChannelRulesV1();
 
         assertNotNull(response);
     }

@@ -108,7 +108,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        QuoteResponseV3 quoteResponse = payoutServiceApi.v3PayoutsPayoutIdQuotePost(payoutId);
+        QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
 
         Assert.assertNotNull(quoteResponse);
     }
@@ -121,7 +121,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        QuoteResponseV3 quoteResponse = payoutServiceApi.v3PayoutsPayoutIdQuotePost(payoutId);
+        QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
 
         ResponseEntity<Void> instructResponse = payoutServiceApi.instructPayoutV3WithHttpInfo(payoutId);
 
@@ -146,7 +146,7 @@ public class PayoutServiceApiTest {
         createPayoutRequest.setPayoutMemo("Java SDK Test");
         createPayoutRequest.setPayments(createPaymentInstructions(getOnboardedPayees()));
 
-        ResponseEntity<Void> responseEntity = payoutServiceApi.submitPayoutWithHttpInfo(createPayoutRequest);
+        ResponseEntity<Void> responseEntity = payoutServiceApi.submitPayoutV3WithHttpInfo(createPayoutRequest);
 
         return responseEntity.getHeaders().getLocation();
     }
