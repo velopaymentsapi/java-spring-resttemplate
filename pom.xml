@@ -58,7 +58,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven-plugin-version>1.0.0</maven-plugin-version>
-        <jackson-version>[2.10.1,)</jackson-version>
+        <jackson-version>2.10.3</jackson-version>
         <swagger-annotations-version>1.6.0</swagger-annotations-version>
         <spring_boot.version>2.2.4.RELEASE</spring_boot.version>
         <openAPIConfig.oa3InputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/v2.22/spec/openapi.yaml</openAPIConfig.oa3InputSpec>
