@@ -59,6 +59,12 @@ public class VeloConfig {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getenv(VELO_API_APISECRET)));
         }
 
+        //verify required properties are set
+        assert(!StringUtils.isEmpty(veloAPIProperties.getBaseUrl()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getPayorId()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getApiKey()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getApiSecret()));
+
         return veloAPIProperties;
     }
 
