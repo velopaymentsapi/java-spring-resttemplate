@@ -68,7 +68,7 @@ public class PayeesApiTest {
         @DisplayName("Test Update Payee Remote Id")
         @Test
         void testUpdateRemoteIdV2() {
-            PayeeResponse2 payeeResponseV3 = inviteNewPayee();
+            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
 
             //newRandom string
             String randomString = RandomStringUtils.randomAlphabetic(10);
@@ -188,18 +188,18 @@ public class PayeesApiTest {
                     null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
-            PayeeResponseV3 payee = payeesApi.getPayeeByIdV3(payeeId, false);
+            PayeeDetailResponse payee = payeesApi.getPayeeByIdV3(payeeId, false);
             assertNotNull(payee);
 
-            PayeeResponseV3 payeeSensitive = payeesApi.getPayeeByIdV3(payeeId, true);
+            PayeeDetailResponse payeeSensitive = payeesApi.getPayeeByIdV3(payeeId, true);
             assertNotNull(payeeSensitive);
         }
 
         @DisplayName("Test Update Remote Id")
         @Test
         void testUpdateRemoteIdV3() {
-            PayeeResponse2 payeeResponseV3 = inviteNewPayee();
-            PayeeResponseV3 payee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
+            PayeeDetailResponse payee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
             System.out.println(payee.toString());
             assertThat(payee.getPayorRefs().size()).isGreaterThan(0);
 
@@ -214,7 +214,7 @@ public class PayeesApiTest {
 
             assertThat(responseEntity.getStatusCode().value()).isEqualTo(204);
 
-            PayeeResponseV3 updatedPayee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            PayeeDetailResponse updatedPayee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
             assertThat(updatedPayee.getPayorRefs().size()).isGreaterThan(0);
             updatedPayee.getPayorRefs().forEach(ref -> {
                 System.out.println(ref.getPayorId());
@@ -231,7 +231,7 @@ public class PayeesApiTest {
         @DisplayName("Test Get Invitation Status")
         @Test
         void testGetInvitationStatusByPayeeId() {
-            PayeeResponse2 payeeResponseV3 = inviteNewPayee();
+            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
 
             PagedPayeeInvitationStatusResponse2 pagedPayeeInvitationStatusResponseV3 = payeeInvitationApi.getPayeesInvitationStatusV3(veloAPIProperties.getPayorIdUuid(), payeeResponseV3.getPayeeId(), null, null, null);
 
@@ -252,7 +252,7 @@ public class PayeesApiTest {
     }
 
     //invite a new payee, wait for payee to be available
-    private PayeeResponse2 inviteNewPayee() {
+    private GetPayeeListResponse inviteNewPayee() {
         PayeeInvitationApiTest payeeInvitationApiTest = new PayeeInvitationApiTest();
         payeeInvitationApiTest.veloAPIProperties = veloAPIProperties;
         CreatePayeesRequest2 createPayeesRequestV3 = payeeInvitationApiTest.buildCreatePayeeRequestV3();
