@@ -237,5 +237,5 @@ public class PaymentAuditServiceApiTest {
 
             assertNotNull(responseV4);
         }
-    }
+    } //V4
 }

@@ -16,13 +16,12 @@
   ~  * limitations under the License.
   ~  */
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.velopayments</groupId>
     <artifactId>java-spring-resttemplate</artifactId>
-    <version>2.19.37-SNAPSHOT</version>
+    <version>2.20.119-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -212,7 +211,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/gh-pages/openapi.json</inputSpec>
+                            <inputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/master/spec/openapi.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <library>resttemplate</library>
 
