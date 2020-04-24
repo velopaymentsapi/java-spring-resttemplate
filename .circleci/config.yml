@@ -1,19 +1,18 @@
 #version: 2.1
-
-#orbs:
-#    maven: circleci/maven@0.0.12
-#workflows:
-#    maven_test:
-#        jobs:
-#           - maven/test # checkout, build, test, and upload test results
-#    nightly:
-#        triggers:
-            # Run Nightly at 3 am, only build v2.20
-#            -   schedule:
-#                    cron: "10 3 * * *"
-#                    filters:
-#                        branches:
-#                            only:
-#                                - v2.20
-#        jobs:
-#            - maven/test
+orbs:
+    maven: circleci/maven@0.0.12
+workflows:
+    maven_test:
+        jobs:
+            - maven/test # checkout, build, test, and upload test results
+    nightly:
+        triggers:
+            # Run Nightly at 3 am, only build v2.21
+            -   schedule:
+                    cron: "15 3 * * *"
+                    filters:
+                        branches:
+                            only:
+                                - v2.21
+        jobs:
+            - maven/test
