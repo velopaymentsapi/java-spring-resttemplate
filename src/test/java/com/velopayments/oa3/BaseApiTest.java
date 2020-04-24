@@ -10,9 +10,6 @@ public abstract class BaseApiTest {
     public ApiClient apiClient;
 
     @Autowired
-    public VeloAuthProperties veloAuthProperties;
-
-    @Autowired
     public VeloAPIProperties veloAPIProperties;
 
     @Autowired

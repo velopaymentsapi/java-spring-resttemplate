@@ -1,6 +1,6 @@
 package com.velopayments.oa3.services;
 
-import com.velopayments.oa3.api.AuthApi;
+import com.velopayments.oa3.api.LoginApi;
 import com.velopayments.oa3.model.AuthResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class VeloApiTokenService {
 
-    private final AuthApi authApi;
+    private final LoginApi loginApi;
 
     @Cacheable(value = "veloAuthTokenCache", sync = true)
     public String getToken() {
         log.debug("Calling Auth API");
-        AuthResponse response = authApi.veloAuth("client_credentials");
+        AuthResponse response = loginApi.veloAuth("client_credentials");
         return response.getAccessToken().toString();
     }
 

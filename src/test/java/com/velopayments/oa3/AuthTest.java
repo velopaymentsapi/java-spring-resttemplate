@@ -4,6 +4,7 @@ import com.velopayments.oa3.api.CountriesApi;
 import com.velopayments.oa3.client.ApiClient;
 import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.SupportedCountriesResponse;
+import com.velopayments.oa3.model.SupportedCountriesResponse2;
 import com.velopayments.oa3.services.VeloApiTokenService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class AuthTest extends BaseApiTest{
 
         CountriesApi countriesApi = new CountriesApi(apiClient);
 
-        SupportedCountriesResponse supportedCountriesResponse = countriesApi.listSupportedCountries();
+        SupportedCountriesResponse2 supportedCountriesResponse = countriesApi.listSupportedCountries();
 
         assertNotNull(supportedCountriesResponse);
 
@@ -61,7 +62,7 @@ public class AuthTest extends BaseApiTest{
 
         CountriesApi countriesApi = new CountriesApi(apiClient);
 
-        SupportedCountriesResponse supportedCountriesResponse = countriesApi.listSupportedCountries();
+        SupportedCountriesResponse2 supportedCountriesResponse = countriesApi.listSupportedCountries();
 
         assertNotNull(supportedCountriesResponse);
 
