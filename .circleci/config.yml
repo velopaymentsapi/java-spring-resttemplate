@@ -7,12 +7,12 @@ workflows:
             - maven/test # checkout, build, test, and upload test results
     nightly:
         triggers:
-            # Run Nightly at 3 am, only build v2.21
+            # Run Nightly at 3 am, only build master
             -   schedule:
                     cron: "15 3 * * *"
                     filters:
                         branches:
                             only:
-                                - v2.21
+                                - master
         jobs:
             - maven/test
