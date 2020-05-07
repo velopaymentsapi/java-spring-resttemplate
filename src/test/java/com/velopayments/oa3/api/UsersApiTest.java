@@ -60,7 +60,7 @@ public class UsersApiTest {
     @DisplayName("Test Get Self")
     @Test
     void testGetSelf() {
-        UserResponse2 response2 = usersApi.getSelf();
+        UserResponse response2 = usersApi.getSelf();
 
         assertNotNull(response2);
     }
