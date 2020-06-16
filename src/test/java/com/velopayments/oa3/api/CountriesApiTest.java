@@ -4,7 +4,7 @@ import com.velopayments.oa3.BaseApiTest;
 import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.PaymentChannelRulesResponse;
 import com.velopayments.oa3.model.SupportedCountriesResponse;
-import com.velopayments.oa3.model.SupportedCountriesResponse2;
+import com.velopayments.oa3.model.SupportedCountriesResponseV2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,7 +31,7 @@ public class CountriesApiTest extends BaseApiTest {
     @Test
     void testListCountriesV2() {
 
-        SupportedCountriesResponse2 response = countriesApi.listSupportedCountries();
+        SupportedCountriesResponseV2 response = countriesApi.listSupportedCountriesV2();
 
         assertNotNull(response);
     }
@@ -39,7 +39,7 @@ public class CountriesApiTest extends BaseApiTest {
     @Test
     void v1PaymentChannelRulesGetTest() {
 
-        PaymentChannelRulesResponse response = countriesApi.v1PaymentChannelRulesGet();
+        PaymentChannelRulesResponse response = countriesApi.listPaymentChannelRulesV1();
 
         assertNotNull(response);
     }

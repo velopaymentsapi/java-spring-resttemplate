@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class VeloApiTokenService {
+public class VeloApiTokenService  {
 
     private final LoginApi loginApi;
 
@@ -23,9 +23,10 @@ public class VeloApiTokenService {
         return response.getAccessToken().toString();
     }
 
-    @CacheEvict("veloAuthTokenCache")
-    @Scheduled(fixedRate = 30000)
+    @CacheEvict(value = "veloAuthTokenCache", allEntries = true)
+    @Scheduled(fixedRate = 600000) //evict every 10 min
     public void evictCache(){
         log.debug("Evicted Auth Token Cache");
     }
+
 }

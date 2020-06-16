@@ -3,8 +3,7 @@ package com.velopayments.oa3;
 import com.velopayments.oa3.api.CountriesApi;
 import com.velopayments.oa3.client.ApiClient;
 import com.velopayments.oa3.config.VeloConfig;
-import com.velopayments.oa3.model.SupportedCountriesResponse;
-import com.velopayments.oa3.model.SupportedCountriesResponse2;
+import com.velopayments.oa3.model.SupportedCountriesResponseV2;
 import com.velopayments.oa3.services.VeloApiTokenService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ public class AuthTest extends BaseApiTest{
 
         CountriesApi countriesApi = new CountriesApi(apiClient);
 
-        SupportedCountriesResponse2 supportedCountriesResponse = countriesApi.listSupportedCountries();
+        SupportedCountriesResponseV2 supportedCountriesResponse = countriesApi.listSupportedCountriesV2();
 
         assertNotNull(supportedCountriesResponse);
 
@@ -62,7 +61,7 @@ public class AuthTest extends BaseApiTest{
 
         CountriesApi countriesApi = new CountriesApi(apiClient);
 
-        SupportedCountriesResponse2 supportedCountriesResponse = countriesApi.listSupportedCountries();
+        SupportedCountriesResponseV2 supportedCountriesResponse = countriesApi.listSupportedCountriesV2();
 
         assertNotNull(supportedCountriesResponse);
 
@@ -70,6 +69,6 @@ public class AuthTest extends BaseApiTest{
 
         //make call with 1st token
         System.out.println("Calling with first token");
-        supportedCountriesResponse = countriesApi.listSupportedCountries(); //goes boom
+        supportedCountriesResponse = countriesApi.listSupportedCountriesV2(); //goes boom
     }
 }

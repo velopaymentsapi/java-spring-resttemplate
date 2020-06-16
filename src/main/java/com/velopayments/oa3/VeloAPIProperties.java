@@ -41,18 +41,4 @@ public class VeloAPIProperties {
         this.payorId = payorId;
         this.payorIdUuid = UUID.fromString(payorId);
     }
-
-    public static final String AUTH_URL = "/v1/authenticate";
-
-    public static final String GET_PAYOR_URL = "/v1/payors/{payorId}";
-
-    public static final String GET_PAYEES_URL = "/v1/payees";
-
-    public static final String GET_PAYOUTS_V3_URL = "/v3/paymentaudit/payouts";
-
-    public static final String GET_PAYMENTS_FOR_PAYOUT_V3_URL = "/v3/paymentaudit/payouts/{payoutId}";
-
-    public static final String GET_PAYMENT_V3_URL = "/v3/paymentaudit/payments/{paymentId}";
-
-    public static final String GET_PAYOUT_SUMMARY_URL = "/v3/payouts/{payoutId}";
 }

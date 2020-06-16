@@ -2,7 +2,7 @@ package com.velopayments.oa3.api;
 
 import com.velopayments.oa3.BaseApiTest;
 import com.velopayments.oa3.config.VeloConfig;
-import com.velopayments.oa3.model.SupportedCurrencyResponse;
+import com.velopayments.oa3.model.SupportedCurrencyResponseV2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +21,7 @@ public class CurrenciesApiTest extends BaseApiTest {
 
     @Test
     void listSupportedCurrenciesTest() {
-        SupportedCurrencyResponse response = currenciesApi.listSupportedCurrencies();
+        SupportedCurrencyResponseV2 response = currenciesApi.listSupportedCurrenciesV2();
 
         assertNotNull(response);
     }

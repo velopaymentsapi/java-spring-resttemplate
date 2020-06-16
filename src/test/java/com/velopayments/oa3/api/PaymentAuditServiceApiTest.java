@@ -30,8 +30,6 @@ public class PaymentAuditServiceApiTest {
     @Autowired
     PaymentAuditServiceApi paymentAuditServiceApi;
 
-    @Autowired //todo - need to move these into Payment Audit
-    PayoutHistoryApi payoutHistoryApi;
 
     @DisplayName("V1")
     @Nested
@@ -40,30 +38,10 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Payout Statistics")
         @Test
         void testGetPayoutStats() {
-            GetPayoutStatistics getPayoutStatistics = payoutHistoryApi.getPayoutStatsV1(veloAPIProperties.getPayorIdUuid());
+            GetPayoutStatistics getPayoutStatistics = paymentAuditServiceApi.getPayoutStatsV1(veloAPIProperties.getPayorIdUuid());
 
             assertThat(getPayoutStatistics).isNotNull();
             assertThat(getPayoutStatistics.getThisMonthPayoutsCount()).isGreaterThan(0);
-        }
-
-        @DisplayName("Test Get Fundings for Payor")
-        @Test
-        void testGetFundingsForPayor() {
-
-            GetFundingsResponse getFundingsResponse = paymentAuditServiceApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), null, null, null);
-
-            assertNotNull(getFundingsResponse);
-            assertThat(getFundingsResponse.getContent().size()).isGreaterThan(0);
-        }
-
-        @DisplayName("Test Get Fundings for Payor With Paging")
-        @Test
-        void testGetFundingsForPayorWithPaging() {
-
-            GetFundingsResponse getFundingsResponse = paymentAuditServiceApi.getFundingsV1(veloAPIProperties.getPayorIdUuid(), 2, 50, null);
-
-            assertNotNull(getFundingsResponse);
-            assertThat(getFundingsResponse.getContent().size()).isGreaterThan(0);
         }
 
         @DisplayName("Test List Payment Changes")
@@ -115,7 +93,7 @@ public class PaymentAuditServiceApiTest {
         @Test
         void testListPaymentsV3() {
 
-            ListPaymentsResponse listPaymentsResponse = paymentAuditServiceApi.listPaymentsAudit(null, veloAPIProperties.getPayorIdUuid(), null, null,
+            ListPaymentsResponseV3 listPaymentsResponse = paymentAuditServiceApi.listPaymentsAudit(null, veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null);
@@ -128,7 +106,7 @@ public class PaymentAuditServiceApiTest {
         @DisplayName("Test Get Payment")
         @Test
         void testGetPaymentV3() {
-            ListPaymentsResponse listPaymentsResponse = paymentAuditServiceApi.listPaymentsAudit(null, veloAPIProperties.getPayorIdUuid(), null, null,
+            ListPaymentsResponseV3 listPaymentsResponse = paymentAuditServiceApi.listPaymentsAudit(null, veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null);

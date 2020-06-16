@@ -3,6 +3,7 @@ package com.velopayments.oa3.config;
 import com.velopayments.oa3.VeloAPIProperties;
 import com.velopayments.oa3.api.*;
 import com.velopayments.oa3.client.ApiClient;
+import com.velopayments.oa3.client.ApiClientDecorator;
 import com.velopayments.oa3.services.VeloApiTokenService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.Cache;
@@ -24,7 +25,6 @@ public class VeloConfig {
     public static final String VELO_API_APISECRET = "VELO_API_APISECRET";
     public static final String VELO_API_PAYORID = "VELO_API_PAYORID";
     public static final String VELO_BASE_URL = "VELO_BASE_URL";
-
 
     /**
      * Set these configuration values in system or environment variables.
@@ -59,6 +59,12 @@ public class VeloConfig {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getenv(VELO_API_APISECRET)));
         }
 
+        //verify required properties are set
+        assert(!StringUtils.isEmpty(veloAPIProperties.getBaseUrl()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getPayorId()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getApiKey()));
+        assert(!StringUtils.isEmpty(veloAPIProperties.getApiSecret()));
+
         return veloAPIProperties;
     }
 
@@ -82,6 +88,7 @@ public class VeloConfig {
         ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
         apiClient.setUsername(veloAPIProperties.getApiKey().toString());
         apiClient.setPassword(veloAPIProperties.getApiSecret().toString());
+        apiClient.setBasePath(veloAPIProperties.getBaseUrl());
         return apiClient;
     }
 
@@ -90,100 +97,78 @@ public class VeloConfig {
         return new LoginApi(apiClient);
     }
 
-    private ApiClient buildTokenApiClient(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
+    private ApiClient buildTokenApiClient(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                          VeloAPIProperties veloAPIProperties){
+        ApiClient apiClient = new ApiClientDecorator(restTemplateBuilder.build(), veloApiTokenService);
+        apiClient.setBasePath(veloAPIProperties.getBaseUrl());
         apiClient.setAccessToken(veloApiTokenService.getToken());
         return apiClient;
     }
 
     @Bean
     @Lazy
-    public CountriesApi countriesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new CountriesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public CountriesApi countriesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                     VeloAPIProperties veloAPIProperties){
+        return new CountriesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public CurrenciesApi currenciesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new CurrenciesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public CurrenciesApi currenciesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                       VeloAPIProperties veloAPIProperties){
+        return new CurrenciesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public FundingManagerApi fundingManagerApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new FundingManagerApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public FundingManagerApi fundingManagerApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                               VeloAPIProperties veloAPIProperties){
+        return new FundingManagerApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public GetPayoutApi getPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new GetPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PayeeInvitationApi payeeInvitationApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new PayeeInvitationApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public InstructPayoutApi instructPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new InstructPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PayeesApi  payeesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                VeloAPIProperties veloAPIProperties){
+        return new PayeesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public PayeeInvitationApi payeeInvitationApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PayeeInvitationApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public PayeesApi  payeesApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PayeesApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public PaymentAuditServiceApi paymentAuditServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PaymentAuditServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PaymentAuditServiceApi paymentAuditServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                                         VeloAPIProperties veloAPIProperties){
+        return new PaymentAuditServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
 
     @Bean
     @Lazy
-    public PayorsApi payorsApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PayorsApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PayorsApi payorsApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new PayorsApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public PayoutHistoryApi payoutHistoryApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new PayoutHistoryApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public PayoutServiceApi payoutServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+                                             VeloAPIProperties veloAPIProperties){
+        return new PayoutServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public QuotePayoutApi quotePayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new QuotePayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public TokensApi tokensApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new TokensApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
     @Lazy
-    public SubmitPayoutApi submitPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new SubmitPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public TokensApi tokensApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new TokensApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public UsersApi usersApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new UsersApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
-    }
-
-    @Bean
-    @Lazy
-    public WithdrawPayoutApi withdrawPayoutApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService){
-        return new WithdrawPayoutApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService));
+    public UsersApi usersApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new UsersApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 }
