@@ -14,6 +14,6 @@ workflows:
                     filters:
                         branches:
                             only:
-                                - v2.22
+                                - master
         jobs:
             - maven/test
