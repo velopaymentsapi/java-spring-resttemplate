@@ -46,11 +46,11 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @Test
         void getPayeesInvitationStatusTest() {
 
-            InvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()));
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()));
 
             assertNotNull(response);
-            assertNotNull(response.getPayeeInvitationStatuses());
-            assertThat(response.getPayeeInvitationStatuses().size()).isGreaterThan(0);
+            assertNotNull(response.getContent());
+            assertThat(response.getContent().size()).isGreaterThan(0);
         }
 
         @DisplayName("Test Resend Payee Invitation")
