@@ -179,7 +179,7 @@ public class PaymentAuditServiceApiTest {
 
             GetPaymentsForPayoutResponseV4 getPaymentsForPayoutResponseV4 = paymentAuditServiceApi.getPaymentsForPayoutV4(payoutSummaryAuditV4.getPayoutId(), null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             assertNotNull(getPaymentsForPayoutResponseV4);
             assertThat(getPaymentsForPayoutResponseV4.getContent().size()).isGreaterThan(0);
@@ -192,7 +192,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             assertNotNull(listPaymentsResponseV4);
             assertThat(listPaymentsResponseV4.getContent().size()).isGreaterThan(0);
@@ -205,7 +205,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null);
+                    null, null, null, null, null);
 
             assertNotNull(listPaymentsResponseV4);
 
