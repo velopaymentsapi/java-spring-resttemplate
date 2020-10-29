@@ -46,11 +46,11 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @Test
         void getPayeesInvitationStatusTest() {
 
-            InvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV1(UUID.fromString(veloAPIProperties.getPayorId()));
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()),null,null,1,100);
 
             assertNotNull(response);
-            assertNotNull(response.getPayeeInvitationStatuses());
-            assertThat(response.getPayeeInvitationStatuses().size()).isGreaterThan(0);
+            assertNotNull(response.getContent());
+            assertThat(response.getContent().size()).isGreaterThan(0);
         }
 
         @DisplayName("Test Resend Payee Invitation")
@@ -61,7 +61,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
             //get first payee id
             UUID payeeId = pagedPayeeResponseV3.getContent().get(0).getPayeeId();
 
-            ResponseEntity<Void> response = payeeInvitationApi.resendPayeeInviteV1WithHttpInfo(payeeId, InvitePayeeRequest.builder().payorId(veloAPIProperties.getPayorIdUuid()).build());
+            ResponseEntity<Void> response = payeeInvitationApi.resendPayeeInviteV3WithHttpInfo(payeeId, InvitePayeeRequest2.builder().payorId(veloAPIProperties.getPayorIdUuid()).build());
             assertNotNull(response);
             assertThat(response.getStatusCode().value()).isEqualTo(200);
         }
@@ -74,7 +74,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Get Payee Invitation Status")
         @Test
         void getPayeesInvitationStatusV2Test() {
-            PagedPayeeInvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV2(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null);
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null);
             assertNotNull(response);
             assertNotNull(response.getContent());
             assertThat(response.getContent().size()).isGreaterThan(0);
@@ -83,7 +83,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Get Payee Invitation Status - by PENDING Status")
         @Test
         void getPayeesInvitationStatusV2TestByInvitationStatus() {
-            PagedPayeeInvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV2(UUID.fromString(veloAPIProperties.getPayorId()), null, InvitationStatus.PENDING, null, null);
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, InvitationStatus.PENDING, null, null);
 
             assertNotNull(response);
             assertNotNull(response.getContent());
@@ -93,7 +93,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Create Payee")
         @Test
         void v2CreatePayeeTest() {
-            ResponseEntity<CreatePayeesCSVResponse> response = payeeInvitationApi.v2CreatePayeeWithHttpInfo(generateCreatePayeeRequestV2());
+            ResponseEntity<CreatePayeesCSVResponse2> response = payeeInvitationApi.v3CreatePayeeWithHttpInfo(generateCreatePayeeRequestV2());
             assertNotNull(response);
             assertNotNull(response.getHeaders().getLocation());
         }
@@ -101,7 +101,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Query Batch Status")
         @Test
         void queryBatchStatus() {
-            ResponseEntity<CreatePayeesCSVResponse> response = payeeInvitationApi.v2CreatePayeeWithHttpInfo(generateCreatePayeeRequestV2());
+            ResponseEntity<CreatePayeesCSVResponse2> response = payeeInvitationApi.v3CreatePayeeWithHttpInfo(generateCreatePayeeRequestV2());
             assertNotNull(response);
 
             URI location = response.getHeaders().getLocation();
@@ -115,28 +115,28 @@ public class PayeeInvitationApiTest extends BaseApiTest {
 
     }
 
-    CreatePayeesRequest generateCreatePayeeRequestV2() {
+    CreatePayeesRequest2 generateCreatePayeeRequestV2() {
         //random string to keep email unique
         String randomString = RandomStringUtils.randomAlphabetic(10);
 
-        CreatePayeesRequest createPayeesRequest = new CreatePayeesRequest();
+        CreatePayeesRequest2 createPayeesRequest = new CreatePayeesRequest2();
         createPayeesRequest.setPayorId(veloAPIProperties.getPayorId());
-        CreatePayee createPayee = new CreatePayee();
+        CreatePayee2 createPayee = new CreatePayee2();
         createPayee.setEmail("john.thompson+" + randomString + "@velopayments.com");
         createPayee.setRemoteId(randomString);
         createPayee.setType(PayeeType.INDIVIDUAL);
-        CreatePayeeAddress createPayeeAddress = new CreatePayeeAddress();
+        CreatePayeeAddress2 createPayeeAddress = new CreatePayeeAddress2();
         createPayeeAddress.setLine1("123 Main St");
         createPayeeAddress.setCity("St Petersburg");
-        createPayeeAddress.setCountry("US");
+        createPayeeAddress.setCountry(CreatePayeeAddress2.CountryEnum.US);
         createPayeeAddress.setZipOrPostcode("33701");
 
         createPayee.setAddress(createPayeeAddress);
 
         createPayeesRequest.addPayeesItem(createPayee);
 
-        CreateIndividual createIndividual = new CreateIndividual();
-        IndividualV1Name individualName = new IndividualV1Name();
+        CreateIndividual2 createIndividual = new CreateIndividual2();
+        CreateIndividual2Name individualName = new CreateIndividual2Name();
         individualName.setFirstName("SDKTest");
         individualName.setLastName(randomString);
         createIndividual.setName(individualName);

@@ -23,7 +23,7 @@ public class CountriesApiTest extends BaseApiTest {
 
     @Test
     void testListCountriesV1() {
-        SupportedCountriesResponse supportedCountriesResponse = countriesApi.listSupportedCountriesV1();
+        SupportedCountriesResponseV2 supportedCountriesResponse = countriesApi.listSupportedCountriesV2();
 
         assertNotNull(supportedCountriesResponse);
     }
