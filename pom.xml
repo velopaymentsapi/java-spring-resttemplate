@@ -62,7 +62,7 @@
         <jackson-version>2.10.3</jackson-version>
         <swagger-annotations-version>1.6.0</swagger-annotations-version>
         <spring_boot.version>2.2.4.RELEASE</spring_boot.version>
-        <openAPIConfig.oa3InputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/v2.24/spec/openapi.yaml</openAPIConfig.oa3InputSpec>
+        <openAPIConfig.oa3InputSpec>https://gist.githubusercontent.com/bhalle/77c6841547eb7f5e18de73390c22591c/raw/9ebc1fd498fcb9f3e3e16c15d9855515bc88173f/openapi.yaml</openAPIConfig.oa3InputSpec>
     </properties>
 
     <dependencies>
