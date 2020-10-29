@@ -61,7 +61,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
             //get first payee id
             UUID payeeId = pagedPayeeResponseV3.getContent().get(0).getPayeeId();
 
-            ResponseEntity<Void> response = payeeInvitationApi.resendPayeeInviteV3WithHttpInfo(payeeId, InvitePayeeRequest.builder().payorId(veloAPIProperties.getPayorIdUuid()).build());
+            ResponseEntity<Void> response = payeeInvitationApi.resendPayeeInviteV3WithHttpInfo(payeeId, InvitePayeeRequest2.builder().payorId(veloAPIProperties.getPayorIdUuid()).build());
             assertNotNull(response);
             assertThat(response.getStatusCode().value()).isEqualTo(200);
         }
@@ -74,7 +74,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Get Payee Invitation Status")
         @Test
         void getPayeesInvitationStatusV2Test() {
-            PagedPayeeInvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null);
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null);
             assertNotNull(response);
             assertNotNull(response.getContent());
             assertThat(response.getContent().size()).isGreaterThan(0);
@@ -83,7 +83,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         @DisplayName("Test Get Payee Invitation Status - by PENDING Status")
         @Test
         void getPayeesInvitationStatusV2TestByInvitationStatus() {
-            PagedPayeeInvitationStatusResponse response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, InvitationStatus.PENDING, null, null);
+            PagedPayeeInvitationStatusResponse2 response = payeeInvitationApi.getPayeesInvitationStatusV3(UUID.fromString(veloAPIProperties.getPayorId()), null, InvitationStatus.PENDING, null, null);
 
             assertNotNull(response);
             assertNotNull(response.getContent());
@@ -128,7 +128,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         CreatePayeeAddress2 createPayeeAddress = new CreatePayeeAddress2();
         createPayeeAddress.setLine1("123 Main St");
         createPayeeAddress.setCity("St Petersburg");
-        createPayeeAddress.setCountry("US");
+        createPayeeAddress.setCountry(CreatePayeeAddress2.CountryEnum.US);
         createPayeeAddress.setZipOrPostcode("33701");
 
         createPayee.setAddress(createPayeeAddress);
