@@ -43,7 +43,7 @@ public class PayeesApiTest {
         @DisplayName(" Test List Payees")
         @Test
         void testListPayeesV1() {
-            PagedPayeeResponse response = payeesApi.listPayeesV1(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null,
+            PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null,
                     null, null, null, null, null, null, null);
 
             assertNotNull(response);
@@ -52,14 +52,14 @@ public class PayeesApiTest {
         @DisplayName("Test Get Payee By Id")
         @Test
         void testGetPayeeByIdV1() {
-            PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null,
+            PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null,
                     null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
-            Payee payee = payeesApi.getPayeeByIdV1(payeeId, false);
+            Payee payee = payeesApi.getPayeeByIdV4(payeeId);
             assertNotNull(payee);
 
-            Payee payeeSensitive = payeesApi.getPayeeByIdV1(payeeId, true);
+            PayeeDetailResponse2 payeeSensitive = payeesApi.getPayeeByIdV4(payeeId, true);
             assertNotNull(payeeSensitive);
         }
 
@@ -77,7 +77,7 @@ public class PayeesApiTest {
             updateRemoteIdRequest.setPayorId(UUID.fromString(veloAPIProperties.getPayorId()));
             updateRemoteIdRequest.setRemoteId(randomString);
 
-            ResponseEntity<Void> responseEntity =  payeesApi.v1PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponseV3.getPayeeId(), updateRemoteIdRequest);
+            ResponseEntity<Void> responseEntity =  payeesApi.v4PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponseV3.getPayeeId(), updateRemoteIdRequest);
 
             assertThat(responseEntity.getStatusCode().value()).isEqualTo(202);
         }
@@ -90,14 +90,14 @@ public class PayeesApiTest {
         @DisplayName("Test Get Payee By Id")
         @Test
         void testGetPayeeByIdV2() {
-            PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+            PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
                     null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
-            PayeeResponseV2 payee = payeesApi.getPayeeByIdV2(payeeId, false);
+            PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeId, false);
             assertNotNull(payee);
 
-            PayeeResponseV2 payeeSensitive = payeesApi.getPayeeByIdV2(payeeId, true);
+            PayeeDetailResponse2 payeeSensitive = payeesApi.getPayeeByIdV4(payeeId, true);
             assertNotNull(payeeSensitive);
         }
     }
@@ -132,7 +132,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V3 by OfacStatus")
             @Test
             void testListPayeesV3ByOfacStatus() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), WatchlistStatus.PASSED, null, OnboardedStatus.ONBOARDED, null,
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), WatchlistStatus.PASSED, null, OnboardedStatus.ONBOARDED, null,
                         null, null, null, null, null, 10, null);
 
                 assertNotNull(response);
@@ -141,7 +141,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V3 by Email")
             @Test
             void testListPayeesV3ByEmail() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, "john.thompson+payee1@velopayments.com",
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, "john.thompson+payee1@velopayments.com",
                         null, null, null, null, null, 10, null);
 
                 assertNotNull(response);
@@ -151,7 +151,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V3 by Payee Country")
             @Test
             void testListPayeesV3ByPayeeCountry() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
                         null, null, null, "US", null, 10, null);
 
                 assertNotNull(response);
@@ -161,7 +161,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V3 by Display Name")
             @Test
             void testListPayeesV3ByDisplayName() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
                         "Thompson, John", null, null, null, null, 10, null);
 
                 assertNotNull(response);
@@ -171,7 +171,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V3 by Payee Type")
             @Test
             void testListPayeesV3ByPayeeType() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
                         null, null, PayeeType.INDIVIDUAL, null, null, 10, null);
 
                 assertNotNull(response);
@@ -188,10 +188,10 @@ public class PayeesApiTest {
                     null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
-            PayeeDetailResponse payee = payeesApi.getPayeeByIdV3(payeeId, false);
+            PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeId, false);
             assertNotNull(payee);
 
-            PayeeDetailResponse payeeSensitive = payeesApi.getPayeeByIdV3(payeeId, true);
+            PayeeDetailResponse2 payeeSensitive = payeesApi.getPayeeByIdV4(payeeId, true);
             assertNotNull(payeeSensitive);
         }
 
@@ -199,7 +199,7 @@ public class PayeesApiTest {
         @Test
         void testUpdateRemoteIdV3() {
             GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
-            PayeeDetailResponse payee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeResponseV3.getPayeeId(), false);
             System.out.println(payee.toString());
             assertThat(payee.getPayorRefs().size()).isGreaterThan(0);
 
@@ -210,11 +210,11 @@ public class PayeesApiTest {
             updateRemoteIdRequestV3.setPayorId(UUID.fromString(veloAPIProperties.getPayorId()));
             updateRemoteIdRequestV3.setRemoteId(randomString);
 
-            ResponseEntity<Void> responseEntity = payeesApi.v3PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponseV3.getPayeeId(), updateRemoteIdRequestV3);
+            ResponseEntity<Void> responseEntity = payeesApi.v4PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponseV3.getPayeeId(), updateRemoteIdRequestV3);
 
             assertThat(responseEntity.getStatusCode().value()).isEqualTo(204);
 
-            PayeeDetailResponse updatedPayee = payeesApi.getPayeeByIdV3(payeeResponseV3.getPayeeId(), false);
+            PayeeDetailResponse2 updatedPayee = payeesApi.getPayeeByIdV4(payeeResponseV3.getPayeeId(), false);
             assertThat(updatedPayee.getPayorRefs().size()).isGreaterThan(0);
             updatedPayee.getPayorRefs().forEach(ref -> {
                 System.out.println(ref.getPayorId());
