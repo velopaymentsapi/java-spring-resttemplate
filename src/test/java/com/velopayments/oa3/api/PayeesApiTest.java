@@ -44,7 +44,7 @@ public class PayeesApiTest {
         @Test
         void testListPayeesV1() {
             PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null, null);
 
             assertNotNull(response);
         }
@@ -53,10 +53,10 @@ public class PayeesApiTest {
         @Test
         void testGetPayeeByIdV1() {
             PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
-            Payee payee = payeesApi.getPayeeByIdV4(payeeId);
+            PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeId, false);
             assertNotNull(payee);
 
             PayeeDetailResponse2 payeeSensitive = payeesApi.getPayeeByIdV4(payeeId, true);
@@ -68,7 +68,7 @@ public class PayeesApiTest {
         @DisplayName("Test Update Payee Remote Id")
         @Test
         void testUpdateRemoteIdV2() {
-            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
+            GetPayeeListResponse2 payeeResponseV3 = inviteNewPayee();
 
             //newRandom string
             String randomString = RandomStringUtils.randomAlphabetic(10);
@@ -91,7 +91,7 @@ public class PayeesApiTest {
         @Test
         void testGetPayeeByIdV2() {
             PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
             PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeId, false);
@@ -113,8 +113,8 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees No Params")
             @Test
             void testListPayeesV3() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                        null, null, null, null, null, null, null);
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+                        null, null, null, null, null, null, null, null);
 
                 assertNotNull(response);
             }
@@ -122,8 +122,8 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees - Onboarded Status")
             @Test
             void testListPayeesV3ByOnboarded() {
-                PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null, OnboardedStatus.ONBOARDED, null,
-                        null, null, null, null, null, null, null);
+                PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, OnboardedStatus.ONBOARDED, null,
+                        null, null, null, null, null, null, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isGreaterThan(0);
@@ -133,7 +133,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV3ByOfacStatus() {
                 PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), WatchlistStatus.PASSED, null, OnboardedStatus.ONBOARDED, null,
-                        null, null, null, null, null, 10, null);
+                        null, null, null, null, null, 10, null, null);
 
                 assertNotNull(response);
             }
@@ -142,7 +142,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV3ByEmail() {
                 PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, "john.thompson+payee1@velopayments.com",
-                        null, null, null, null, null, 10, null);
+                        null, null, null, null, null, 10, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isEqualTo(1);
@@ -152,7 +152,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV3ByPayeeCountry() {
                 PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                        null, null, null, "US", null, 10, null);
+                        null, null, null, "US", null, 10, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isGreaterThan(0);
@@ -162,7 +162,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV3ByDisplayName() {
                 PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                        "Thompson, John", null, null, null, null, 10, null);
+                        "Thompson, John", null, null, null, null, 10, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isGreaterThan(0);
@@ -172,7 +172,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV3ByPayeeType() {
                 PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                        null, null, PayeeType.INDIVIDUAL, null, null, 10, null);
+                        null, null, PayeeType.INDIVIDUAL, null, null, 10, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isGreaterThan(0);
@@ -184,8 +184,8 @@ public class PayeesApiTest {
         @DisplayName("Test Get Payee By ID")
         @Test
         void testGetPayeeByIdV3() {
-            PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                    null, null, null, null, null, null, null);
+            PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
+                    null, null, null, null, null, null, null, null);
             UUID payeeId = response.getContent().get(0).getPayeeId();
 
             PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeId, false);
@@ -198,7 +198,7 @@ public class PayeesApiTest {
         @DisplayName("Test Update Remote Id")
         @Test
         void testUpdateRemoteIdV3() {
-            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
+            GetPayeeListResponse2 payeeResponseV3 = inviteNewPayee();
             PayeeDetailResponse2 payee = payeesApi.getPayeeByIdV4(payeeResponseV3.getPayeeId(), false);
             System.out.println(payee.toString());
             assertThat(payee.getPayorRefs().size()).isGreaterThan(0);
@@ -231,9 +231,9 @@ public class PayeesApiTest {
         @DisplayName("Test Get Invitation Status")
         @Test
         void testGetInvitationStatusByPayeeId() {
-            GetPayeeListResponse payeeResponseV3 = inviteNewPayee();
+            GetPayeeListResponse2 payeeResponseV3 = inviteNewPayee();
 
-            PagedPayeeInvitationStatusResponse2 pagedPayeeInvitationStatusResponseV3 = payeeInvitationApi.getPayeesInvitationStatusV3(veloAPIProperties.getPayorIdUuid(), payeeResponseV3.getPayeeId(), null, null, null);
+            PagedPayeeInvitationStatusResponse2 pagedPayeeInvitationStatusResponseV3 = payeeInvitationApi.getPayeesInvitationStatusV4(veloAPIProperties.getPayorIdUuid(), payeeResponseV3.getPayeeId(), null, null, null);
 
             assertThat(pagedPayeeInvitationStatusResponseV3.getContent().size()).isEqualTo(1);
             assertThat(pagedPayeeInvitationStatusResponseV3.getContent().get(0).getInvitationStatus()).isEqualByComparingTo(PayeeInvitationStatusResponse2.InvitationStatusEnum.PENDING);
@@ -244,7 +244,7 @@ public class PayeesApiTest {
         void testListPayeeChanges() {
             OffsetDateTime changedSince = OffsetDateTime.now().minusYears(1);
 
-            PayeeDeltaResponse2 payeeDeltaResponse2 = payeesApi.listPayeeChangesV3(veloAPIProperties.getPayorIdUuid(), changedSince, null, null);
+            PayeeDeltaResponse2 payeeDeltaResponse2 = payeesApi.listPayeeChangesV4(veloAPIProperties.getPayorIdUuid(), changedSince, null, null);
 
             assertThat(payeeDeltaResponse2).isNotNull();
             assertThat(payeeDeltaResponse2.getContent().size()).isGreaterThan(0);
@@ -252,23 +252,23 @@ public class PayeesApiTest {
     }
 
     //invite a new payee, wait for payee to be available
-    private GetPayeeListResponse inviteNewPayee() {
+    private GetPayeeListResponse2 inviteNewPayee() {
         PayeeInvitationApiTest payeeInvitationApiTest = new PayeeInvitationApiTest();
         payeeInvitationApiTest.veloAPIProperties = veloAPIProperties;
         CreatePayeesRequest2 createPayeesRequestV3 = payeeInvitationApiTest.buildCreatePayeeRequestV3();
 
         //create new payee
-        payeeInvitationApi.v3CreatePayee(createPayeesRequestV3);
+        payeeInvitationApi.v4CreatePayee(createPayeesRequestV3);
 
         //can be a short lag while service creates payee
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            PagedPayeeResponse2 tempResponse = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null,null, null, null,
-                    null, createPayeesRequestV3.getPayees().get(0).getRemoteId(), null, null, null, null, null);
+            PagedPayeeResponse2 tempResponse = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null,null, null, null,
+                    null, createPayeesRequestV3.getPayees().get(0).getRemoteId(), null, null, null, null, null, null);
             assertThat(tempResponse.getContent().size()).isGreaterThan(0);
         });
 
-        PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()), null,null, null, null,
-                null, createPayeesRequestV3.getPayees().get(0).getRemoteId(), null, null, null, null, null);
+        PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null,null, null, null,
+                null, createPayeesRequestV3.getPayees().get(0).getRemoteId(), null, null, null, null, null, null);
 
         //created payee
         return response.getContent().get(0);

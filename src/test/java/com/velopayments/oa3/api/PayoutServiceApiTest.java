@@ -157,7 +157,7 @@ public class PayoutServiceApiTest {
         return UUID.fromString(appUuid);
     }
 
-    private List<PaymentInstructionV3> createPaymentInstructions(List<GetPayeeListResponse> payeeResponseV3s){
+    private List<PaymentInstructionV3> createPaymentInstructions(List<GetPayeeListResponse2> payeeResponseV3s){
         if(payeeResponseV3s == null){
             return new ArrayList<>();
         }
@@ -179,10 +179,10 @@ public class PayoutServiceApiTest {
         return paymentInstructions;
     }
 
-    private List<GetPayeeListResponse> getOnboardedPayees(){
+    private List<GetPayeeListResponse2> getOnboardedPayees(){
 
-        PagedPayeeResponse2 response = payeesApi.listPayeesV3(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatus.ONBOARDED, null,
-                null, "john.thompson+payee1", null, null, null, 10, null);
+        PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatus.ONBOARDED, null,
+                null, "john.thompson+payee1", null, null, null, 10, null, null);
 
         return response.getContent();
     }
