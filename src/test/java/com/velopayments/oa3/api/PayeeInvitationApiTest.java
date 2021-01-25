@@ -97,22 +97,6 @@ public class PayeeInvitationApiTest extends BaseApiTest {
             assertNotNull(response);
             assertNotNull(response.getHeaders().getLocation());
         }
-
-        @DisplayName("Test Query Batch Status")
-        @Test
-        void queryBatchStatus() {
-            ResponseEntity<CreatePayeesCSVResponse2> response = payeeInvitationApi.v3CreatePayeeWithHttpInfo(generateCreatePayeeRequestV2());
-            assertNotNull(response);
-
-            URI location = response.getHeaders().getLocation();
-
-            String[] parts = StringUtils.splitByWholeSeparator(location.getPath(), "/");
-            String appUuid = parts[3];
-
-            QueryBatchResponse queryBatchResponse = payeeInvitationApi.queryBatchStatusV2(UUID.fromString(appUuid));
-            assertNotNull(queryBatchResponse);
-        }
-
     }
 
     CreatePayeesRequest2 generateCreatePayeeRequestV2() {
