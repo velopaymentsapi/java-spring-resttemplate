@@ -33,7 +33,7 @@ public class UsersApiTest {
     @Test
     void testListUsersNoOptions() {
 
-        PagedUserResponse response = usersApi.listUsers(null, null, null, null, null, null);
+        PagedUserResponse response = usersApi.listUsers(null, null, null, null, null, null, null);
 
         assertNotNull(response);
         assertThat(response.getContent().size()).isGreaterThan(0);
@@ -44,7 +44,7 @@ public class UsersApiTest {
     @Test
     void testGetUser() {
 
-        PagedUserResponse response = usersApi.listUsers(null, null, null, null, null, null);
+        PagedUserResponse response = usersApi.listUsers(null, null, null, null, null, null, null);
 
         assertNotNull(response);
 
