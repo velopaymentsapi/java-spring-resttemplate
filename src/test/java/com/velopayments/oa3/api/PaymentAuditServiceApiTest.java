@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Payment Audit")
 @WebMvcTest()

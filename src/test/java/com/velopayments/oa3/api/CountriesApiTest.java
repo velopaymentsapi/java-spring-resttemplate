@@ -3,7 +3,6 @@ package com.velopayments.oa3.api;
 import com.velopayments.oa3.BaseApiTest;
 import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.PaymentChannelRulesResponse;
-import com.velopayments.oa3.model.SupportedCountriesResponse;
 import com.velopayments.oa3.model.SupportedCountriesResponseV2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

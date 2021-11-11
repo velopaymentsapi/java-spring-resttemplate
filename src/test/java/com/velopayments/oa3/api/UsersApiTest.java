@@ -16,7 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebMvcTest()
 @ContextConfiguration(classes = VeloConfig.class)

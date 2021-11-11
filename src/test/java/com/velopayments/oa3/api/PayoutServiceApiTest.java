@@ -5,7 +5,6 @@ import com.velopayments.oa3.config.VeloConfig;
 import com.velopayments.oa3.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,8 +78,8 @@ public class PayoutServiceApiTest {
 
         URI location = submitPayout();
 
-        Assert.assertNotNull(location);
-        Assert.assertNotNull(getUUIDFromPayoutLocation(location));
+        assertNotNull(location);
+        assertNotNull(getUUIDFromPayoutLocation(location));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        Assert.assertNotNull(summaryResponse);
+        assertNotNull(summaryResponse);
         System.out.println(summaryResponse.getStatus());
     }
 
@@ -112,7 +111,7 @@ public class PayoutServiceApiTest {
 
         QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
 
-        Assert.assertNotNull(quoteResponse);
+        assertNotNull(quoteResponse);
     }
 
     @Test
@@ -129,7 +128,7 @@ public class PayoutServiceApiTest {
 
         ResponseEntity<Void> instructResponse = payoutServiceApi.instructPayoutV3WithHttpInfo(payoutId, instructPayoutRequest);
 
-        Assert.assertNotNull(instructResponse);
+        assertNotNull(instructResponse);
         assertThat(instructResponse.getStatusCode().value()).isEqualTo(202);
     }
 
