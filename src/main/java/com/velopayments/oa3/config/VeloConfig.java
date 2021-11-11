@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;
@@ -32,28 +33,44 @@ public class VeloConfig {
      * @return
      */
     @Bean
-    VeloAPIProperties veloAPIProperties(){
+    VeloAPIProperties veloAPIProperties(Environment env){
         VeloAPIProperties veloAPIProperties = new VeloAPIProperties();
 
-        if (!StringUtils.isEmpty(System.getProperty(VELO_BASE_URL))) {
+        String baseUrl = env.getProperty("velo.base.url");
+
+        if (!StringUtils.isEmpty(baseUrl)) {
+            veloAPIProperties.setBaseUrl(baseUrl);
+        } else if (!StringUtils.isEmpty(System.getProperty(VELO_BASE_URL))) {
             veloAPIProperties.setBaseUrl(System.getProperty(VELO_BASE_URL));
         } else if (!StringUtils.isEmpty(System.getenv(VELO_BASE_URL))) {
             veloAPIProperties.setBaseUrl(System.getenv(VELO_BASE_URL));
         }
 
-        if (!StringUtils.isEmpty(System.getProperty(VELO_API_PAYORID))) {
+        String apiPayorId = env.getProperty("velo.api.payorid");
+
+        if (!StringUtils.isEmpty(apiPayorId)){
+            veloAPIProperties.setPayorId(apiPayorId);
+        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_PAYORID))) {
             veloAPIProperties.setPayorId(System.getProperty(VELO_API_PAYORID));
         } else if (!StringUtils.isEmpty(System.getenv(VELO_API_PAYORID))) {
             veloAPIProperties.setPayorId(System.getenv(VELO_API_PAYORID));
         }
 
-        if (!StringUtils.isEmpty(System.getProperty(VELO_API_APIKEY))) {
+        String apiKey = env.getProperty("velo.api.apikey");
+
+        if (!StringUtils.isEmpty(apiKey)) {
+            veloAPIProperties.setApiKey(UUID.fromString(apiKey));
+        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_APIKEY))) {
             veloAPIProperties.setApiKey(UUID.fromString(System.getProperty(VELO_API_APIKEY)));
         } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APIKEY)))) {
             veloAPIProperties.setApiKey(UUID.fromString(System.getenv(VELO_API_APIKEY)));
         }
 
-        if (!StringUtils.isEmpty(System.getProperty(VELO_API_APISECRET))) {
+        String apiSecret = env.getProperty("velo.api.apisecret");
+
+        if (!StringUtils.isEmpty(apiSecret)) {
+            veloAPIProperties.setApiKey(UUID.fromString(apiSecret));
+        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_APISECRET))) {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getProperty(VELO_API_APISECRET)));
         } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APISECRET)))) {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getenv(VELO_API_APISECRET)));

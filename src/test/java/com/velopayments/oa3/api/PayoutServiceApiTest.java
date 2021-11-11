@@ -74,7 +74,6 @@ public class PayoutServiceApiTest {
      //   instructPayoutApi.v3PayoutsPayoutIdPost(UUID.randomUUID());
     }
 
-    @Disabled
     @Test
     void testSubmitPayout() {
 
@@ -84,7 +83,6 @@ public class PayoutServiceApiTest {
         Assert.assertNotNull(getUUIDFromPayoutLocation(location));
     }
 
-    @Disabled
     @Test
     void testGetPayout()  {
         UUID payoutId = getUUIDFromPayoutLocation(submitPayout());
@@ -95,7 +93,6 @@ public class PayoutServiceApiTest {
         System.out.println(summaryResponse.getStatus());
     }
 
-    @Disabled
     @Test
     void testWithDrawlPayout() {
         URI location = submitPayout();
@@ -106,7 +103,6 @@ public class PayoutServiceApiTest {
         payoutServiceApi.withdrawPayoutV3(payoutId);
     }
 
-    @Disabled
     @Test
     void testQuotePayout() {
         URI location = submitPayout();
@@ -119,7 +115,6 @@ public class PayoutServiceApiTest {
         Assert.assertNotNull(quoteResponse);
     }
 
-    @Disabled //todo fix
     @Test
     void testInstructPayout() {
         URI location = submitPayout();
@@ -191,7 +186,7 @@ public class PayoutServiceApiTest {
     private List<GetPayeeListResponse2> getOnboardedPayees(){
 
         PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatus.ONBOARDED, null,
-                null, "john.thompson+payee1", null, null, null, 10, null, null);
+                null, null, null, null, null, null, null, null);
 
         return response.getContent();
     }
