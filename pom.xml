@@ -21,7 +21,7 @@
 
     <groupId>com.velopayments</groupId>
     <artifactId>java-spring-resttemplate</artifactId>
-    <version>2.28.8-SNAPSHOT</version>
+    <version>2.28.8</version>
 
 
     <packaging>jar</packaging>
@@ -323,7 +323,7 @@
         <connection>scm:git:https://github.com/velopaymentsapi/java-spring-resttemplate.git</connection>
         <developerConnection>scm:git:git@github.com:velopaymentsapi/java-spring-resttemplate.git</developerConnection>
         <url>https://github.com/velopaymentsapi/java-spring-resttemplate</url>
-        <tag>HEAD</tag>
+        <tag>java-spring-resttemplate-2.28.8</tag>
     </scm>
 
     <distributionManagement>
