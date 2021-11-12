@@ -38,49 +38,51 @@ public class VeloConfig {
 
         String baseUrl = env.getProperty("velo.base.url");
 
-        if (!StringUtils.isEmpty(baseUrl)) {
+        if (StringUtils.hasText(baseUrl)) {
             veloAPIProperties.setBaseUrl(baseUrl);
-        } else if (!StringUtils.isEmpty(System.getProperty(VELO_BASE_URL))) {
+        } else if (StringUtils.hasText(System.getProperty(VELO_BASE_URL))) {
             veloAPIProperties.setBaseUrl(System.getProperty(VELO_BASE_URL));
-        } else if (!StringUtils.isEmpty(System.getenv(VELO_BASE_URL))) {
+        } else if (StringUtils.hasText(System.getenv(VELO_BASE_URL))) {
             veloAPIProperties.setBaseUrl(System.getenv(VELO_BASE_URL));
         }
 
         String apiPayorId = env.getProperty("velo.api.payorid");
 
-        if (!StringUtils.isEmpty(apiPayorId)){
+        if (StringUtils.hasText(apiPayorId)){
             veloAPIProperties.setPayorId(apiPayorId);
-        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_PAYORID))) {
+        } else if (StringUtils.hasText(System.getProperty(VELO_API_PAYORID))) {
             veloAPIProperties.setPayorId(System.getProperty(VELO_API_PAYORID));
-        } else if (!StringUtils.isEmpty(System.getenv(VELO_API_PAYORID))) {
+        } else if (StringUtils.hasText(System.getenv(VELO_API_PAYORID))) {
             veloAPIProperties.setPayorId(System.getenv(VELO_API_PAYORID));
         }
 
         String apiKey = env.getProperty("velo.api.apikey");
 
-        if (!StringUtils.isEmpty(apiKey)) {
+        if (StringUtils.hasText(apiKey)) {
             veloAPIProperties.setApiKey(UUID.fromString(apiKey));
-        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_APIKEY))) {
+        } else if (StringUtils.hasText(System.getProperty(VELO_API_APIKEY))) {
             veloAPIProperties.setApiKey(UUID.fromString(System.getProperty(VELO_API_APIKEY)));
-        } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APIKEY)))) {
+        } else if (StringUtils.hasText(System.getenv(VELO_API_APIKEY))) {
             veloAPIProperties.setApiKey(UUID.fromString(System.getenv(VELO_API_APIKEY)));
         }
 
         String apiSecret = env.getProperty("velo.api.apisecret");
 
-        if (!StringUtils.isEmpty(apiSecret)) {
-            veloAPIProperties.setApiKey(UUID.fromString(apiSecret));
-        } else if (!StringUtils.isEmpty(System.getProperty(VELO_API_APISECRET))) {
+        if (StringUtils.hasText(apiSecret)) {
+            veloAPIProperties.setApiSecret(UUID.fromString(apiSecret));
+        } else if (StringUtils.hasText(System.getProperty(VELO_API_APISECRET))) {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getProperty(VELO_API_APISECRET)));
-        } else if (!StringUtils.isEmpty(UUID.fromString(System.getenv(VELO_API_APISECRET)))) {
+        } else if (StringUtils.hasText(System.getenv(VELO_API_APISECRET))) {
             veloAPIProperties.setApiSecret(UUID.fromString(System.getenv(VELO_API_APISECRET)));
         }
 
         //verify required properties are set
-        assert(!StringUtils.isEmpty(veloAPIProperties.getBaseUrl()));
-        assert(!StringUtils.isEmpty(veloAPIProperties.getPayorId()));
-        assert(!StringUtils.isEmpty(veloAPIProperties.getApiKey()));
-        assert(!StringUtils.isEmpty(veloAPIProperties.getApiSecret()));
+        assert(StringUtils.hasText(veloAPIProperties.getBaseUrl()));
+        assert(StringUtils.hasText(veloAPIProperties.getPayorId()));
+        assert (veloAPIProperties.getApiKey() != null);
+        assert (veloAPIProperties.getApiSecret() != null);
+        assert(StringUtils.hasText(veloAPIProperties.getApiKey().toString()));
+        assert(StringUtils.hasText(veloAPIProperties.getApiSecret().toString()));
 
         return veloAPIProperties;
     }
@@ -102,6 +104,13 @@ public class VeloConfig {
 
     @Bean("authApiClient")
     public ApiClient authApiClient(RestTemplateBuilder restTemplateBuilder, VeloAPIProperties veloAPIProperties){
+
+        assert(StringUtils.hasText(veloAPIProperties.getPayorId()));
+        assert (veloAPIProperties.getApiKey() != null);
+        assert (veloAPIProperties.getApiSecret() != null);
+        assert(StringUtils.hasText(veloAPIProperties.getApiKey().toString()));
+        assert(StringUtils.hasText(veloAPIProperties.getApiSecret().toString()));
+
         ApiClient apiClient = new ApiClient(restTemplateBuilder.build());
         apiClient.setUsername(veloAPIProperties.getApiKey().toString());
         apiClient.setPassword(veloAPIProperties.getApiSecret().toString());
