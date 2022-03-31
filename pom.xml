@@ -61,7 +61,7 @@
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <jackson-version>2.10.3</jackson-version>
         <swagger-annotations-version>1.6.0</swagger-annotations-version>
-        <spring_boot.version>2.5.6</spring_boot.version>
+        <spring_boot.version>2.5.12</spring_boot.version>
 <!--        <openAPIConfig.oa3InputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/v2.27/spec/openapi.yaml</openAPIConfig.oa3InputSpec>-->
         <openAPIConfig.oa3InputSpec>oa3.yml</openAPIConfig.oa3InputSpec>
 
