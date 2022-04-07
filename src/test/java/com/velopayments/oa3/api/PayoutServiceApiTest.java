@@ -160,14 +160,14 @@ public class PayoutServiceApiTest {
         return UUID.fromString(appUuid);
     }
 
-    private List<PaymentInstructionV3> createPaymentInstructions(List<GetPayeeListResponse2> payeeResponseV3s){
-        if(payeeResponseV3s == null){
+    private List<PaymentInstructionV3> createPaymentInstructions(List<GetPayeeListResponseV4> payeeResponse){
+        if(payeeResponse == null){
             return new ArrayList<>();
         }
 
-        List<PaymentInstructionV3> paymentInstructions = new ArrayList<>(payeeResponseV3s.size());
+        List<PaymentInstructionV3> paymentInstructions = new ArrayList<>(payeeResponse.size());
 
-        payeeResponseV3s.forEach(payeeResponseV3 -> {
+        payeeResponse.forEach(payeeResponseV3 -> {
             PaymentInstructionV3 paymentInstruction = new PaymentInstructionV3();
             paymentInstruction.setRemoteId(payeeResponseV3.getPayorRefs().get(0).getRemoteId());
             paymentInstruction.setAmount(1000L);
@@ -182,10 +182,10 @@ public class PayoutServiceApiTest {
         return paymentInstructions;
     }
 
-    private List<GetPayeeListResponse2> getOnboardedPayees(){
+    private List<GetPayeeListResponseV4> getOnboardedPayees(){
 
-        PagedPayeeResponse2 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatus.ONBOARDED, null,
-                null, null, null, null, null, null, null, null);
+        PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatusV4.ONBOARDED, null,
+                null, "john.thompson+payee1", null, null, null, null, null, null);
 
         return response.getContent();
     }

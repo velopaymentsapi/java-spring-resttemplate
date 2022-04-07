@@ -20,7 +20,7 @@ public class VeloApiTokenService  {
     public String getToken() {
         log.debug("Calling Auth API");
         AuthResponse response = loginApi.veloAuth("client_credentials");
-        return response.getAccessToken().toString();
+        return response.getAccessToken();
     }
 
     @CacheEvict(value = "veloAuthTokenCache", allEntries = true)

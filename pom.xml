@@ -21,7 +21,7 @@
 
     <groupId>com.velopayments</groupId>
     <artifactId>java-spring-resttemplate</artifactId>
-    <version>2.28.9-SNAPSHOT</version>
+    <version>2.30.0-SNAPSHOT</version>
 
 
     <packaging>jar</packaging>
@@ -59,12 +59,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven-plugin-version>1.0.0</maven-plugin-version>
-        <jackson-version>2.10.3</jackson-version>
-        <swagger-annotations-version>1.6.0</swagger-annotations-version>
-        <spring_boot.version>2.5.6</spring_boot.version>
-<!--        <openAPIConfig.oa3InputSpec>https://raw.githubusercontent.com/velopaymentsapi/VeloOpenApi/v2.27/spec/openapi.yaml</openAPIConfig.oa3InputSpec>-->
-        <openAPIConfig.oa3InputSpec>oa3.yml</openAPIConfig.oa3InputSpec>
-
+        <jackson-version>2.13.2</jackson-version>
+        <swagger-annotations-version>1.6.6</swagger-annotations-version>
+        <spring_boot.version>2.6.6</spring_boot.version>
+        <openAPIConfig.oa3InputSpec>openapi.yaml</openAPIConfig.oa3InputSpec>
     </properties>
 
     <dependencies>
@@ -136,7 +134,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>1.18.22</version>
             <optional>true</optional>
         </dependency>
 
@@ -167,12 +165,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.0.0-M6</version>
                 <configuration>
                     <argLine>
                         --illegal-access=permit
@@ -190,7 +188,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.0</version>
+                <version>3.0.0-M6</version>
                 <configuration>
                     <argLine>
                         --illegal-access=permit
@@ -208,7 +206,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.1</version>
                  <executions>
                     <execution>
                         <goals>
@@ -229,7 +227,7 @@
                             <artifactVersion>${project.version}</artifactVersion>
 
                             <configOptions>
-                                <additionalModelTypeAnnotations>@lombok.Builder @lombok.AllArgsConstructor @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
+                                <additionalModelTypeAnnotations>@lombok.Builder @lombok.AllArgsConstructor</additionalModelTypeAnnotations>
                                 <modelPackage>com.velopayments.oa3.model</modelPackage>
                                 <sourceFolder>src/gen/java/main</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
@@ -237,7 +235,8 @@
                                 <useBeanValidation>true</useBeanValidation>
                                 <apiPackage>com.velopayments.oa3.api</apiPackage>
                                 <invokerPackage>com.velopayments.oa3.client</invokerPackage>
-                                <legacyDiscriminatorBehavior>true</legacyDiscriminatorBehavior>
+                                <legacyDiscriminatorBehavior>false</legacyDiscriminatorBehavior>
+                                <openApiNullable>false</openApiNullable>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -266,7 +265,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.12</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh-velo</serverId>
@@ -277,7 +276,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -290,7 +289,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.3.2</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>

@@ -4,6 +4,8 @@ import com.velopayments.oa3.VeloAPIProperties;
 import com.velopayments.oa3.api.*;
 import com.velopayments.oa3.client.ApiClient;
 import com.velopayments.oa3.client.ApiClientDecorator;
+import com.velopayments.oa3.client.auth.HttpBasicAuth;
+import com.velopayments.oa3.client.auth.HttpBearerAuth;
 import com.velopayments.oa3.services.VeloApiTokenService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.Cache;
@@ -12,12 +14,14 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
 @Configuration
 @EnableCaching
+@EnableScheduling
 @ComponentScan(basePackages = {"com.velopayments.oa3"},
     excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ApiClient.class)})
 public class VeloConfig {
