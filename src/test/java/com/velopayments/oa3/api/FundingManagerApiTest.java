@@ -174,21 +174,35 @@ public class FundingManagerApiTest extends BaseApiTest {
 
             assertNotNull(sourceAccountResponse);
         }
+    }
 
-        @DisplayName("Create ACH Funding Request V2")
+    @DisplayName("V2")
+    @Nested
+    class FundingManagerV3Tests {
+        @DisplayName("Create ACH Funding Request V3")
         @Test
         void createFundingRequestTest() {
             UUID sourceAccountId = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
 
-            FundingRequestV2 fundingRequestV2 = new FundingRequestV2();
-            fundingRequestV2.amount(1000L);
+            FundingRequestV3 fundingRequestV3 = new FundingRequestV3();
+            fundingRequestV3.amount(1000L);
+            fundingRequestV3.setFundingAccountId(getFundingAccount());
 
-            fundingManagerApi.createFundingRequest(sourceAccountId, fundingRequestV2);
+            fundingManagerApi.createFundingRequestV3(sourceAccountId, fundingRequestV3);
         }
     }
 
     private UUID getSourceAccountUuid(UUID payorIdUuid) {
         ListSourceAccountResponse listSourceAccountResponse = fundingManagerApi.getSourceAccounts(null, payorIdUuid, 1, 25, null);
         return listSourceAccountResponse.getContent().get(0).getId();
+    }
+
+    private UUID getFundingAccount() {
+        //UUID sourceAccount = getSourceAccountUuid(veloAPIProperties.getPayorIdUuid());
+
+        ListFundingAccountsResponseV2 fundingAccountsResponseV2 = fundingManagerApi.getFundingAccountsV2(veloAPIProperties.getPayorIdUuid(),
+                null, null, null, null, null, null, null, null);
+
+        return fundingAccountsResponseV2.getContent().get(0).getId();
     }
 }
