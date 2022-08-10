@@ -185,7 +185,7 @@ public class PayoutServiceApiTest {
     private List<GetPayeeListResponseV4> getOnboardedPayees(){
 
         PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, "ONBOARDED", null,
-                null, "john.thompson+payee1", null, null, null, null, null, null);
+                null, "56565600", null, null, null, null, null, null);
 
         return response.getContent();
     }
