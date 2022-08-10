@@ -97,7 +97,8 @@ public class PaymentAuditServiceApiTest {
             ListPaymentsResponseV4 listPaymentsResponse = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null);
+                    null, null, null, null, null,
+                    null, null, null, null, null, null);
 
             assertNotNull(listPaymentsResponse);
             assertThat(listPaymentsResponse.getContent().size()).isGreaterThan(0);
@@ -110,7 +111,8 @@ public class PaymentAuditServiceApiTest {
             ListPaymentsResponseV4 listPaymentsResponse = paymentAuditServiceApi.listPaymentsAuditV4(null, veloAPIProperties.getPayorIdUuid(), null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null);
+                    null, null, null, null, null,
+                    null, null, null, null, null, null);
 
             assertNotNull(listPaymentsResponse);
 
@@ -193,7 +195,8 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null, null, null, null, null, null);
+                    null, null, null, null,
+                    null, null, null, null, null, null);
 
             assertNotNull(listPaymentsResponseV4);
             assertThat(listPaymentsResponseV4.getContent().size()).isGreaterThan(0);
@@ -206,7 +209,8 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null, null, null, null, null, null);
+                    null, null, null, null,
+                    null, null, null, null, null, null);
 
             assertNotNull(listPaymentsResponseV4);
 

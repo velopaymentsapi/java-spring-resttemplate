@@ -95,7 +95,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees - Onboarded Status")
             @Test
             void testListPayeesV4ByOnboarded() {
-                PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, OnboardedStatusV4.ONBOARDED, null,
+                PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null, "ONBOARDED", null,
                         null, null, null, null, null, null, null, null);
 
                 assertNotNull(response);
@@ -105,7 +105,7 @@ public class PayeesApiTest {
             @DisplayName("Test List Payees V4 by OfacStatus")
             @Test
             void testListPayeesV3ByOfacStatus() {
-                PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), WatchlistStatusV3.PASSED, null, OnboardedStatusV4.ONBOARDED, null,
+                PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), "PASSED", null, "ONBOARDED", null,
                         null, null, null, null, null, 10, null, null);
 
                 assertNotNull(response);
@@ -148,7 +148,7 @@ public class PayeesApiTest {
             @Test
             void testListPayeesV4ByPayeeType() {
                 PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()), null, null,null, null,
-                        null, null, PayeeType2.INDIVIDUAL, null, null, 10, null, null);
+                        null, null, "INDIVIDUAL", null, null, 10, null, null);
 
                 assertNotNull(response);
                 assertThat(response.getContent().size()).isGreaterThan(0);
@@ -187,7 +187,7 @@ public class PayeesApiTest {
                 PagedPayeeInvitationStatusResponseV4 pagedPayeeInvitationStatusResponse = payeeInvitationApi.getPayeesInvitationStatusV4(veloAPIProperties.getPayorIdUuid(), payeeResponse.getPayeeId(), null, null, null);
 
                 assertThat(pagedPayeeInvitationStatusResponse.getContent().size()).isEqualTo(1);
-                assertThat(pagedPayeeInvitationStatusResponse.getContent().get(0).getInvitationStatus()).isEqualByComparingTo(PayeeInvitationStatusResponseV4.InvitationStatusEnum.PENDING);
+                assertThat(pagedPayeeInvitationStatusResponse.getContent().get(0).getInvitationStatus()).isEqualTo("PENDING");
             }
 
             //todo add v4 delete payee by id

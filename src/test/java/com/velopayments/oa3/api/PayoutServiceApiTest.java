@@ -123,7 +123,7 @@ public class PayoutServiceApiTest {
 
         QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
 
-        InstructPayoutRequest instructPayoutRequest = InstructPayoutRequest.builder()
+        InstructPayoutRequestV3 instructPayoutRequest = InstructPayoutRequestV3.builder()
                 .build();
 
         ResponseEntity<Void> instructResponse = payoutServiceApi.instructPayoutV3WithHttpInfo(payoutId, instructPayoutRequest);
@@ -184,7 +184,7 @@ public class PayoutServiceApiTest {
 
     private List<GetPayeeListResponseV4> getOnboardedPayees(){
 
-        PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, OnboardedStatusV4.ONBOARDED, null,
+        PagedPayeeResponseV4 response = payeesApi.listPayeesV4(UUID.fromString(veloAPIProperties.getPayorId()),null, null, "ONBOARDED", null,
                 null, "john.thompson+payee1", null, null, null, null, null, null);
 
         return response.getContent();
