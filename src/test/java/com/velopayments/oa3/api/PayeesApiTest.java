@@ -57,7 +57,7 @@ public class PayeesApiTest {
             updateRemoteIdRequestV3.setPayorId(UUID.fromString(veloAPIProperties.getPayorId()));
             updateRemoteIdRequestV3.setRemoteId(randomString);
 
-            ResponseEntity<Void> responseEntity = payeesApi.v3PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponse.getPayeeId(), updateRemoteIdRequestV3);
+            ResponseEntity<Void> responseEntity = payeesApi.v4PayeesPayeeIdRemoteIdUpdatePostWithHttpInfo(payeeResponse.getPayeeId(), updateRemoteIdRequestV3);
 
             assertThat(responseEntity.getStatusCode().value()).isEqualTo(204);
 
