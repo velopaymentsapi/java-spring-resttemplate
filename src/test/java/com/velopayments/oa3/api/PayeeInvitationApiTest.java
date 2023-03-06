@@ -195,6 +195,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         CreatePayeeAddressV4 createPayeeAddress = new CreatePayeeAddressV4();
         createPayeeAddress.setLine1("123 Main St");
         createPayeeAddress.setCity("St Petersburg");
+        createPayeeAddress.setCountyOrProvince("FL");
         createPayeeAddress.setCountry("US");
         createPayeeAddress.setZipOrPostcode("33701");
         createPayeeV4.setAddress(createPayeeAddress);
