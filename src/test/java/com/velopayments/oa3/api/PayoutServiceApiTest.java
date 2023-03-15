@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class PayoutServiceApiTest {
 
     @Autowired
-    PayoutServiceApi payoutServiceApi;
+    PayoutsApi payoutsApi;
 
     @Autowired
     PaymentAuditServiceApi paymentAuditServiceApi;
@@ -60,7 +60,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryAudit payoutSummaryAuditV3 = getPayoutsResponse.getContent().get(0);
 
-        PayoutSummaryResponseV3 payoutSummaryResponseV3 = payoutServiceApi.getPayoutSummaryV3(payoutSummaryAuditV3.getPayoutId());
+        PayoutSummaryResponseV3 payoutSummaryResponseV3 = payoutsApi.getPayoutSummaryV3(payoutSummaryAuditV3.getPayoutId());
 
         assertNotNull(payoutSummaryResponseV3);
     }
@@ -99,7 +99,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        payoutServiceApi.withdrawPayoutV3(payoutId);
+        payoutsApi.withdrawPayoutV3(payoutId);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
+        QuoteResponseV3 quoteResponse = payoutsApi.createQuoteForPayoutV3(payoutId);
 
         assertNotNull(quoteResponse);
     }
@@ -121,12 +121,12 @@ public class PayoutServiceApiTest {
 
         PayoutSummaryResponseV3 summaryResponse = awaitPayoutStatus(payoutId.toString(), "ACCEPTED");
 
-        QuoteResponseV3 quoteResponse = payoutServiceApi.createQuoteForPayoutV3(payoutId);
+        QuoteResponseV3 quoteResponse = payoutsApi.createQuoteForPayoutV3(payoutId);
 
         InstructPayoutRequestV3 instructPayoutRequest = InstructPayoutRequestV3.builder()
                 .build();
 
-        ResponseEntity<Void> instructResponse = payoutServiceApi.instructPayoutV3WithHttpInfo(payoutId, instructPayoutRequest);
+        ResponseEntity<Void> instructResponse = payoutsApi.instructPayoutV3WithHttpInfo(payoutId, instructPayoutRequest);
 
         assertNotNull(instructResponse);
         assertThat(instructResponse.getStatusCode().value()).isEqualTo(202);
@@ -134,13 +134,13 @@ public class PayoutServiceApiTest {
 
     PayoutSummaryResponseV3 awaitPayoutStatus(String payoutId, String status){
         await().atMost(15, TimeUnit.SECONDS).pollInterval(500, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PayoutSummaryResponseV3 summaryResponse = payoutServiceApi.getPayoutSummaryV3(UUID.fromString(payoutId));
+            PayoutSummaryResponseV3 summaryResponse = payoutsApi.getPayoutSummaryV3(UUID.fromString(payoutId));
 
             log.debug("Payout Status is: " + summaryResponse.getStatus());
 
             assertThat(summaryResponse.getStatus()).isEqualTo(status);
         });
-        return payoutServiceApi.getPayoutSummaryV3(UUID.fromString(payoutId));
+        return payoutsApi.getPayoutSummaryV3(UUID.fromString(payoutId));
     }
 
 
@@ -149,7 +149,7 @@ public class PayoutServiceApiTest {
         createPayoutRequest.setPayoutMemo("Java SDK Test");
         createPayoutRequest.setPayments(createPaymentInstructions(getOnboardedPayees()));
 
-        ResponseEntity<Void> responseEntity = payoutServiceApi.submitPayoutV3WithHttpInfo(createPayoutRequest);
+        ResponseEntity<Void> responseEntity = payoutsApi.submitPayoutV3WithHttpInfo(createPayoutRequest);
 
         return responseEntity.getHeaders().getLocation();
     }

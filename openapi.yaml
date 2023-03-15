@@ -78,7 +78,7 @@ info:
     name: Apache License 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Velo Payments APIs
-  version: 2.32.27
+  version: 2.35.57
   x-logo:
     url: https://apidocs.velopayments.com/velo-logo-e9573185_new.svg
 servers:
@@ -98,8 +98,29 @@ tags:
   - description: A Payor is the entity which is sending money. Here you will find the
       available APIs for working with Payors.
     name: Payors
-  - description: Payout Service APIs allow you to create and instruct payouts to payees.
+  - description: |
+      <p>Payors that are part of the same organization can be linked together in a hierarchical fashion</p>
+      <p>Payors higher up in the tree can read and write data on behalf of payors below them</p>
+      <p>For example Payor A can make payouts on behalf of Payor B if Payor B is linked below Payor A</p>
+      <p>Payors can not access data of payors above them in the hierarchy</p>
+      <p>Contact Velo if you need to link payors in your organization</p>
+    name: Payor Hierarchy
+  - description: |
+      <p>Payout APIs allow you to create and instruct payouts to payees</p>
+      <p>There are three phases to a payout:</p>
+      <ul>
+          <li>Submit - the payments are created within the platform</li>
+          <li>Quote - optional step if FX is involved</li>
+          <li>Instruct - the payments are sent to the payment rails for processing</li>
+      </ul>
+      <p>Between 1 and 2000 payments can be created within the platform as part of a Payout</p>
     name: Payouts
+  - description: |
+      <p>APIs for initiating funding of source accounts from external sources and viewing balance updates</p>
+    name: Funding
+  - description: |
+      <p>Source Accounts are where funds are drawn from for making payouts</p>
+    name: Source Accounts
   - description: Payment Audit Service APIs allow you to see the history of fundings,
       payouts, and payments to payees.
     name: Payment Audit Service
@@ -122,9 +143,12 @@ paths:
   /v1/authenticate:
     post:
       description: |
-        Use this endpoint to obtain an access token for calling Velo Payments APIs. Use HTTP Basic Auth. String value of
-        Basic and a Base64 endcoded string comprising the API key (e.g. 44a9537d-d55d-4b47-8082-14061c2bcdd8) and API
-        secret  (e.g. c396b26b-137a-44fd-87f5-34631f8fd529) with a colon between them. E.g. Basic 44a9537d-d55d-4b47-8082-14061c2bcdd8:c396b26b-137a-44fd-87f5-34631f8fd529
+        <p>Use this endpoint to obtain an access token for calling Velo Payments APIs. </p>
+        <p>You need your API key and API secret issued by Velo</p>
+        <p>To login and get an access token the API key and API secret must be Base64 encoded by concatenating them with a colon between them</p>
+        <p>e.g. Given an ApiKey: 44a9537d-d55d-4b47-8082-14061c2bcdd8 and ApiSecret: c396b26b-137a-44fd-87f5-34631f8fd529</p>
+        <p>Using a Base64 encode function Base64Encoder().encode("44a9537d-d55d-4b47-8082-14061c2bcdd8:c396b26b-137a-44fd-87f5-34631f8fd529")</p>
+        <p>Included as a Basic Authorization header: -H "Authorization: Basic NDRhOTUzN2QtZDU1ZC00YjQ3LTgwODItMTQwNjFjMmJjZGQ4OmMzOTZiMjZiLTEzN2EtNDRmZC04N2Y1LTM0NjMxZjhmZDUyOQ==" </p>
       operationId: veloAuth
       parameters:
         - description: OAuth grant type. Should use 'client_credentials'
@@ -1263,8 +1287,9 @@ paths:
     get:
       deprecated: true
       description: |
-        Get a Single Payor by Id.
-      operationId: getPayorById
+        <p>Get a Single Payor by Id.</p>
+        <p>deprecated since v2.10 - Use /v2/payors
+      operationId: getPayorByIdV1
       parameters:
         - description: The Payor Id
           in: path
@@ -1429,9 +1454,12 @@ paths:
           serviceName: payor-service
   /v1/payors/{payorId}/applications:
     post:
-      description: Create an application for the given Payor ID. Applications are
-        programatic users which can be assigned unique keys.
-      operationId: payorCreateApplicationRequest
+      description: |
+        <p>Create an application for the given Payor ID.</p>
+        <p>Applications provide a means to group your API Keys</p>
+        <p>For example you might have an SAP application that you wish to integrate with Velo</p>
+        <p>You can create an application and then create one or more API keys for the application</p>
+      operationId: payorCreateApplicationV1
       parameters:
         - description: The Payor Id
           in: path
@@ -1472,6 +1500,9 @@ paths:
             Location:
               description: location
               schema:
+                example: |
+                  <p>HTTP/1.1 201 Created</p>
+                  <p>Location: https://api.sandbox.velopayments.com/v1/payors/2e144160-e87f-4976-b577-6087e683f419/applications/8701c174-b64a-476a-ab1a-4af27f09f0b8</p>
                 type: string
           x-contracts:
             - contractId: 1
@@ -1524,8 +1555,11 @@ paths:
           serviceName: payor-service
   /v1/payors/{payorId}/applications/{applicationId}/keys:
     post:
-      description: Create an an API key for the given payor Id and application Id
-      operationId: payorCreateApiKeyRequest
+      description: |
+        <p>Create an an API key for the given payor Id and application Id</p>
+        <p>You can create multiple API Keys for a given application</p>
+        <p>API Keys are programmatic users for integrating your application with the Velo platform</p>
+      operationId: payorCreateApiKeyV1
       parameters:
         - description: The Payor Id
           in: path
@@ -1556,7 +1590,7 @@ paths:
               name: Key Name
               description: A key description
               roles:
-                - payor.admin
+                - velo.payor.admin
             matchers:
               headers:
                 - key: Content-Type
@@ -1626,7 +1660,7 @@ paths:
             $ curl 'https://api.sandbox.velopayments.com/v1/payors/79a6fdaa-f4bb-47b7-9c1f-f6fd99c156a0/applications/ba08877f-9d96-41e4-9c26-44a872d856ae/keys' -i -X POST \
                 -H 'Content-Type: application/json' \
                 -H 'Authorization: Bearer 698f1609-c616-48f0-b8d5-03373e9fbd40' \
-                -d '{"name":"foo","description":"a foo key","roles":["foo.role"]}'
+                -d '{"name":"foo","description":"a foo key","roles":["velo.payor.admin"]}'
       x-contracts:
         - contractId: 4
           name: Create an API key for a payor
@@ -1713,9 +1747,10 @@ paths:
           contractPath: /v1/payors/00000000-0000-0000-0000-000000000000/reminderEmailsUpdate
   /v1/payors/{payorId}/branding/logos:
     post:
-      description: Add Payor Logo. Logo file is used in your branding, and emails
-        sent to payees.
-      operationId: payorAddPayorLogo
+      description: |
+        <p>Add Payor Logo</p>
+        <p>Logo file is used in your branding and emails sent to payees</p>
+      operationId: payorAddPayorLogoV1
       parameters:
         - description: The Payor Id
           in: path
@@ -1860,8 +1895,9 @@ paths:
           serviceName: payor-service
   /v1/payorLinks:
     get:
-      description: This endpoint allows you to list payor links
-      operationId: payorLinks
+      description: |
+        <p>If the payor is set up as part of a hierarchy you can use this API to traverse the hierarchy</p>
+      operationId: payorLinksV1
       parameters:
         - description: The Payor ID from which to start the query to show all descendants
           in: query
@@ -1870,7 +1906,7 @@ paths:
           schema:
             format: uuid
             type: string
-        - description: Look for the parent payor details for this payor id
+        - description: Query for the parent payor details for this payor id
           in: query
           name: parentOfPayor
           required: false
@@ -1878,11 +1914,10 @@ paths:
             format: uuid
             type: string
         - description: |
-            List of additional Payor fields to include in the response for each Payor.
-            The values of payorId and payorName and always included for each Payor - 'fields' allows you to add to this.
-            Example: ```fields=primaryContactEmail,kycState``` - will include payorId+payorName+primaryContactEmail+kycState for each Payor
-            Default if not specified is to include only payorId and payorName.
-            The supported fields are any combination of: primaryContactEmail,kycState
+            <p>List of additional Payor fields to include in the response for each Payor</p>
+            <p>The values of payorId and payorName are always included for each Payor by default</p>
+            <p>You can add fields to the response for each payor by including them in the fields parameter separated by commas</p>
+            <p>The supported fields are any combination of: primaryContactEmail,kycState</p>
           in: query
           name: fields
           required: false
@@ -1973,7 +2008,7 @@ paths:
             This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
       summary: List Payor Links
       tags:
-        - Payors
+        - Payor Hierarchy
       x-contracts:
         - contractId: 1
           ignored: true
@@ -3793,12 +3828,16 @@ paths:
                 -H 'Content-Type: application/json'
     post:
       description: |
-        Initiate the process of creating 1 to 2000 payees in a batch Use the response location header to query
-        for status (201 - Created, 400 - invalid request body. In addition to standard semantic validations, a
-        400 will also result if there is a duplicate remote id within the batch / if there is a duplicate email
-        within the batch, i.e. if there is a conflict between the data provided for one payee within the batch and
-        that provided for another payee within the same batch). The validation at this stage is intra-batch only.
-        Validation against payees who have already been invited occurs subsequently during processing of the batch.
+        <p>Initiate the process of creating 1 to 2000 payees in a batch</p>
+        <p>Use the batchId in the response to query for status.</p>
+        <p>In addition to standard semantic validations, a 400 will also result if: </p>
+        <ul>
+        <li>there is a duplicate remote id within the batch</li>
+        <li>there is a duplicate email within the batch, i.e. if there is a conflict between the data provided for one payee within the batch and
+        that provided for another payee within the same batch).</li>
+        </ul>
+        <p>The validation at this stage is intra-batch only.</p>
+        <p>Validation against payees who have already been invited occurs subsequently during processing of the batch.</p>
       operationId: v4CreatePayee
       requestBody:
         content:
@@ -3905,6 +3944,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreatePayeesCSVResponseV4'
           description: HTTP Created. Body created only on CSV requests
+          headers:
+            Location:
+              schema:
+                description: A url pointing to the location of the batch. This can
+                  be used to get the status of the batch
+                example: https://api.sandbox.velopayments.com/v4/payees/batch/dbe7df3a-6b75-4bcb-97c5-45d25f828267
+                type: string
           x-contracts:
             - contractId: 1
               headers:
@@ -4332,182 +4378,12 @@ paths:
             $ curl 'https://api.sandbox.velopayments.com/v4/payees/deltas?pageSize=2&page=8&payorId=0a818933-087d-47f2-ad83-2f986ed087eb&updatedSince=2019-01-20T09:00:00+00:00' -i -X GET \
                 -H 'Authorization: Bearer 6dd5e976-e329-462f-bd6b-25d463cf02fd' \
                 -H 'Content-Type: application/json'
-  /v1/sourceAccounts:
-    description: List Source Accounts
-    get:
-      deprecated: true
-      description: List source accounts.
-      operationId: getSourceAccounts
-      parameters:
-        - description: Physical Account Name
-          in: query
-          name: physicalAccountName
-          required: false
-          schema:
-            type: string
-        - description: The account owner Payor ID
-          in: query
-          name: payorId
-          required: false
-          schema:
-            format: uuid
-            type: string
-        - description: Page number. Default is 1.
-          in: query
-          name: page
-          required: false
-          schema:
-            default: 1
-            format: int32
-            type: integer
-        - description: The number of results to return in a page
-          in: query
-          name: pageSize
-          required: false
-          schema:
-            default: 25
-            format: int32
-            maximum: 100
-            minimum: 1
-            type: integer
-        - description: |
-            List of sort fields e.g. ?sort=name:asc
-            Default is name:asc
-            The supported sort fields are - fundingRef
-          in: query
-          name: sort
-          required: false
-          schema:
-            default: fundingRef:asc
-            pattern: '[fundingRef]+[:desc|:asc]'
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListSourceAccountResponse'
-          description: List Source Account response
-        400:
-          description: Invalid Request Parameters
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        404:
-          description: Not Found
-      summary: Get list of source accounts
-      tags:
-        - Funding Manager
-      x-code-samples:
-        - lang: shell
-          source: |
-            $ curl 'https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6' -i -X GET \
-                -H 'Authorization: Bearer 757a7dbf-2afb-45ec-877c-2aa3857c8e08'
-    summary: List Source Accounts
-  /v1/sourceAccounts/{sourceAccountId}:
-    description: Get details about given source account.
-    get:
-      deprecated: true
-      description: Get details about given source account.
-      operationId: getSourceAccount
-      parameters:
-        - description: Source account id
-          in: path
-          name: sourceAccountId
-          required: true
-          schema:
-            format: uuid
-            type: string
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SourceAccountResponse'
-          description: Source account response
-        400:
-          description: Bad Request, Invalid path parameter
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        404:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-          description: |
-            The resource was not found or is no longer available
-      summary: Get details about given source account.
-      tags:
-        - Funding Manager
-      x-code-samples:
-        - lang: shell
-          source: |
-            $ curl 'https://api.sandbox.velopayments.com/v1/sourceAccounts/126895a8-ba3d-44e8-9b34-84ee579cee7a' -i -X GET \
-                -H 'Authorization: Bearer a016f840-dafc-4b10-95f5-70ecc75a02d1'
-    summary: Get Source Account
-  /v1/sourceAccounts/{sourceAccountId}/achFundingRequest:
-    post:
-      deprecated: true
-      description: Instruct a funding request to transfer funds from the payor’s funding
-        bank to the payor’s balance held within Velo.
-      operationId: createAchFundingRequest
-      parameters:
-        - description: Source account id
-          in: path
-          name: sourceAccountId
-          required: true
-          schema:
-            format: uuid
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FundingRequestV1'
-        description: Body to included amount to be funded
-        required: true
-      responses:
-        202:
-          description: Request Accepted
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_400'
-          description: Invalid request. See Error message payload for details of failure
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        404:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-          description: |
-            The resource was not found or is no longer available
-      summary: Create Funding Request
-      tags:
-        - Funding Manager
-      x-code-samples:
-        - lang: shell
-          source: |
-            $ curl 'https://api.sandbox.velopayments.com/v1/sourceAccounts/533b082b-b3eb-4712-8242-0fd3a307033f/achFundingRequest' -i -X POST \
-                -H 'Authorization: Bearer 67c1b4fc-29ce-425c-863b-950163a5e971' \
-                -H 'Content-Type: application/json' \
-                -d '{"amount":999990}'
   /v1/sourceAccounts/{sourceAccountId}/notifications:
     post:
-      description: Set notifications for a given source account
+      deprecated: true
+      description: |
+        <p>Set notifications for a given source account</p>
+        <p>deprecated since 2.34 (use v3 version)</p>
       operationId: setNotificationsRequest
       parameters:
         - description: Source account id
@@ -4556,7 +4432,7 @@ paths:
             The resource was not found or is no longer available
       summary: Set notifications
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -4618,7 +4494,7 @@ paths:
             The resource was not found or is no longer available
       summary: Create Funding Request
       tags:
-        - Funding Manager
+        - Funding
       x-code-samples:
         - lang: shell
           source: |
@@ -4725,7 +4601,7 @@ paths:
             The resource was not found or is no longer available
       summary: Get list of source accounts
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -4781,7 +4657,7 @@ paths:
             The resource was not found or is no longer available
       summary: Get Source Account
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -4844,7 +4720,7 @@ paths:
             The resource was not found or is no longer available
       summary: Transfer Funds between source accounts
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -4852,344 +4728,10 @@ paths:
                 -H 'Authorization: Bearer 67c1b4fc-29ce-425c-863b-950163a5e971' \
                 -H 'Content-Type: application/json' \
                 -d '{ "toSourceAccountId": "a99f93f9-6845-451d-a1f5-f3c841599dd7", "amount": 10000, "currency": "USD" }'
-  /v1/fundingAccounts:
-    get:
-      deprecated: true
-      description: Get the funding accounts.
-      operationId: getFundingAccounts
-      parameters:
-        - in: query
-          name: payorId
-          required: false
-          schema:
-            format: uuid
-            type: string
-        - in: query
-          name: sourceAccountId
-          required: false
-          schema:
-            format: uuid
-            type: string
-        - description: Page number. Default is 1.
-          in: query
-          name: page
-          required: false
-          schema:
-            default: 1
-            format: int32
-            type: integer
-        - description: The number of results to return in a page
-          in: query
-          name: pageSize
-          required: false
-          schema:
-            default: 25
-            format: int32
-            maximum: 100
-            minimum: 1
-            type: integer
-        - description: List of sort fields (e.g. ?sort=accountName:asc,name:asc) Default
-            is accountName:asc The supported sort fields are - accountName, name and
-            currency.
-          in: query
-          name: sort
-          required: false
-          schema:
-            default: accountName:asc
-            pattern: '[a-zA-Z]+[:desc|:asc]'
-            type: string
-        - in: query
-          name: sensitive
-          required: false
-          schema:
-            default: false
-            type: boolean
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListFundingAccountsResponse'
-          description: Get Funding Accounts Response
-        403:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-          description: |
-            The authentication does not have permissions to access the resource
-            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_400'
-          description: Invalid request. See Error message payload for details of failure
-      summary: Get Funding Accounts
-      tags:
-        - Funding Manager
-  /v1/fundingAccounts/{fundingAccountId}:
-    get:
-      deprecated: true
-      description: Get Funding Account by ID
-      operationId: getFundingAccount
-      parameters:
-        - in: path
-          name: fundingAccountId
-          required: true
-          schema:
-            format: uuid
-            type: string
-        - in: query
-          name: sensitive
-          required: false
-          schema:
-            default: false
-            type: boolean
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FundingAccountResponse'
-          description: Funding Account Response
-        400:
-          description: Bad Request
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        403:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-          description: |
-            The authentication does not have permissions to access the resource
-            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
-        404:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-          description: |
-            The resource was not found or is no longer available
-      summary: Get Funding Account
-      tags:
-        - Funding Manager
-  /v2/fundingAccounts:
-    get:
-      description: Get the funding accounts.
-      operationId: getFundingAccountsV2
-      parameters:
-        - in: query
-          name: payorId
-          required: false
-          schema:
-            format: uuid
-            type: string
-        - description: The descriptive funding account name
-          in: query
-          name: name
-          required: false
-          schema:
-            type: string
-        - description: The 2 letter ISO 3166-1 country code (upper case)
-          in: query
-          name: country
-          required: false
-          schema:
-            example: US
-            type: string
-        - description: The ISO 4217 currency code
-          in: query
-          name: currency
-          required: false
-          schema:
-            example: USD
-            type: string
-        - description: The type of funding account.
-          in: query
-          name: type
-          required: false
-          schema:
-            $ref: '#/components/schemas/FundingAccountTypeV2'
-        - description: Page number. Default is 1.
-          in: query
-          name: page
-          required: false
-          schema:
-            default: 1
-            format: int32
-            type: integer
-        - description: The number of results to return in a page
-          in: query
-          name: pageSize
-          required: false
-          schema:
-            default: 25
-            format: int32
-            maximum: 100
-            minimum: 1
-            type: integer
-        - description: List of sort fields (e.g. ?sort=accountName:asc,name:asc) Default
-            is accountName:asc The supported sort fields are - accountName, name.
-          in: query
-          name: sort
-          required: false
-          schema:
-            default: accountName:asc
-            pattern: '[a-zA-Z]+[:desc|:asc]'
-            type: string
-        - in: query
-          name: sensitive
-          required: false
-          schema:
-            default: false
-            type: boolean
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListFundingAccountsResponseV2'
-          description: Get Funding Accounts Response
-        403:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-          description: |
-            The authentication does not have permissions to access the resource
-            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_400'
-          description: Invalid request. See Error message payload for details of failure
-      summary: Get Funding Accounts
-      tags:
-        - Funding Manager
-    post:
-      description: Create Funding Account
-      operationId: createFundingAccountV2
-      requestBody:
-        content:
-          application/json:
-            examples:
-              fbo:
-                summary: FBO Example
-                value:
-                  type: FBO
-                  name: My FBO Account
-                  payorId: ee53e01d-c078-43fd-abd4-47e92f4a06cf
-                  accountName: My Account Name
-                  accountNumber: 1231231234556
-                  routingNumber: 123456789
-              wubs:
-                summary: WUBS
-                value:
-                  type: WUBS_DECOUPLED
-                  name: My WUBS Account
-                  payorId: ee53e01d-c078-43fd-abd4-47e92f4a06cf
-                  currency: USD
-            schema:
-              $ref: '#/components/schemas/CreateFundingAccountRequestV2'
-      responses:
-        202:
-          description: Funding Account Creation Request Accepted
-          headers:
-            Location:
-              description: Reference to status object
-              schema:
-                format: uri
-                type: string
-            Retry-After:
-              description: How long the user agent should wait before making a follow-up
-                request (seconds)
-              schema:
-                type: integer
-        400:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_400'
-          description: Invalid request. See Error message payload for details of failure
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        403:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-          description: |
-            The authentication does not have permissions to access the resource
-            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
-      summary: Create Funding Account
-      tags:
-        - Funding Manager Private
-  /v2/fundingAccounts/{fundingAccountId}:
-    get:
-      description: Get Funding Account by ID
-      operationId: getFundingAccountV2
-      parameters:
-        - in: path
-          name: fundingAccountId
-          required: true
-          schema:
-            format: uuid
-            type: string
-        - in: query
-          name: sensitive
-          required: false
-          schema:
-            default: false
-            type: boolean
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FundingAccountResponseV2'
-          description: Funding Account Response
-        400:
-          description: Bad Request
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-          description: Invalid access token. May be expired or invalid
-        403:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-          description: |
-            The authentication does not have permissions to access the resource
-            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
-        404:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-          description: |
-            The resource was not found or is no longer available
-      summary: Get Funding Account
-      tags:
-        - Funding Manager
   /v3/sourceAccounts/{sourceAccountId}/fundingRequest:
     post:
-      description: Instruct a funding request to transfer funds from the payor’s funding
-        bank to the payor’s balance held within Velo  (202 - accepted, 400 - invalid
-        request body, 404 - source account not found).
+      description: |
+        <p>Instruct a funding request to transfer funds from the payor’s funding bank to the payor’s balance held within Velo</p>
       operationId: createFundingRequestV3
       parameters:
         - description: Source account id
@@ -5209,6 +4751,12 @@ paths:
       responses:
         202:
           description: Request Accepted
+          headers:
+            Location:
+              description: Reference to created Funding Request
+              schema:
+                example: https://api.sandbox.velopayments.com/v1/fundings/8c1a8e1c-0147-4d8c-9f92-b696e1515750
+                type: string
         400:
           content:
             application/json:
@@ -5238,7 +4786,7 @@ paths:
             The resource was not found or is no longer available
       summary: Create Funding Request
       tags:
-        - Funding Manager
+        - Funding
       x-code-samples:
         - lang: shell
           source: |
@@ -5358,7 +4906,7 @@ paths:
             The resource was not found or is no longer available
       summary: Get list of source accounts
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -5469,7 +5017,7 @@ paths:
             The resource was not found or is no longer available
       summary: Get details about given source account.
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -5531,7 +5079,7 @@ paths:
             The resource was not found or is no longer available
       summary: Transfer Funds between source accounts
       tags:
-        - Funding Manager
+        - Source Accounts
       x-code-samples:
         - lang: shell
           source: |
@@ -5539,6 +5087,283 @@ paths:
                 -H 'Authorization: Bearer 67c1b4fc-29ce-425c-863b-950163a5e971' \
                 -H 'Content-Type: application/json' \
                 -d '{ "toSourceAccountId": "a99f93f9-6845-451d-a1f5-f3c841599dd7", "amount": 10000, "currency": "USD" }'
+  /v3/sourceAccounts/{sourceAccountId}/notifications:
+    post:
+      description: |
+        <p>Set notifications for a given source account</p>
+        <p>If the balance falls below the amount set in the request an email notification will be sent to the email address registered in the payor profile</p>
+      operationId: setNotificationsRequestV3
+      parameters:
+        - description: Source account id
+          in: path
+          name: sourceAccountId
+          required: true
+          schema:
+            format: uuid
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetNotificationsRequest_2'
+        description: Body to included minimum balance to set
+        required: true
+      responses:
+        204:
+          description: Request Fulfilled
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request. See Error message payload for details of failure
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+          description: Invalid access token. May be expired or invalid
+        403:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403'
+          description: |
+            The authentication does not have permissions to access the resource
+            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+          description: |
+            The resource was not found or is no longer available
+      summary: Set notifications
+      tags:
+        - Source Accounts
+      x-code-samples:
+        - lang: shell
+          source: |
+            $ curl 'https://api.sandbox.velopayments.com/v3/sourceAccounts/533b082b-b3eb-4712-8242-0fd3a307033f/notifications' -i -X POST \
+                -H 'Authorization: Bearer 67c1b4fc-29ce-425c-863b-950163a5e971' \
+                -H 'Content-Type: application/json' \
+                -d '{"minimumBalance":900}'
+  /v2/fundingAccounts:
+    get:
+      description: Get the funding accounts.
+      operationId: getFundingAccountsV2
+      parameters:
+        - in: query
+          name: payorId
+          required: false
+          schema:
+            format: uuid
+            type: string
+        - description: The descriptive funding account name
+          in: query
+          name: name
+          required: false
+          schema:
+            type: string
+        - description: The 2 letter ISO 3166-1 country code (upper case)
+          in: query
+          name: country
+          required: false
+          schema:
+            example: US
+            type: string
+        - description: The ISO 4217 currency code
+          in: query
+          name: currency
+          required: false
+          schema:
+            example: USD
+            type: string
+        - description: The type of funding account.
+          in: query
+          name: type
+          required: false
+          schema:
+            $ref: '#/components/schemas/FundingAccountTypeV2'
+        - description: Page number. Default is 1.
+          in: query
+          name: page
+          required: false
+          schema:
+            default: 1
+            format: int32
+            type: integer
+        - description: The number of results to return in a page
+          in: query
+          name: pageSize
+          required: false
+          schema:
+            default: 25
+            format: int32
+            maximum: 100
+            minimum: 1
+            type: integer
+        - description: List of sort fields (e.g. ?sort=accountName:asc,name:asc) Default
+            is accountName:asc The supported sort fields are - accountName, name.
+          in: query
+          name: sort
+          required: false
+          schema:
+            default: accountName:asc
+            pattern: '[a-zA-Z]+[:desc|:asc]'
+            type: string
+        - in: query
+          name: sensitive
+          required: false
+          schema:
+            default: false
+            type: boolean
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFundingAccountsResponseV2'
+          description: Get Funding Accounts Response
+        403:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403'
+          description: |
+            The authentication does not have permissions to access the resource
+            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request. See Error message payload for details of failure
+      summary: Get Funding Accounts
+      tags:
+        - Funding
+    post:
+      description: Create Funding Account
+      operationId: createFundingAccountV2
+      requestBody:
+        content:
+          application/json:
+            examples:
+              fbo:
+                summary: FBO Example
+                value:
+                  type: FBO
+                  name: My FBO Account
+                  payorId: ee53e01d-c078-43fd-abd4-47e92f4a06cf
+                  accountName: My Account Name
+                  accountNumber: 1231231234556
+                  routingNumber: 123456789
+              wubs:
+                summary: WUBS
+                value:
+                  type: WUBS_DECOUPLED
+                  name: My WUBS Account
+                  payorId: ee53e01d-c078-43fd-abd4-47e92f4a06cf
+                  currency: USD
+              private:
+                summary: PRIVATE Example
+                value:
+                  type: PRIVATE
+                  name: My PRIVATE Account
+                  payorId: ee53e01d-c078-43fd-abd4-47e92f4a06cf
+                  accountName: My Account Name
+                  accountNumber: 1231231234556
+                  routingNumber: 123456789
+                  currency: AUD
+            schema:
+              $ref: '#/components/schemas/CreateFundingAccountRequestV2'
+      responses:
+        202:
+          description: Funding Account Creation Request Accepted
+          headers:
+            Location:
+              description: Reference to status object
+              schema:
+                format: uri
+                type: string
+            Retry-After:
+              description: How long the user agent should wait before making a follow-up
+                request (seconds)
+              schema:
+                type: integer
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request. See Error message payload for details of failure
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+          description: Invalid access token. May be expired or invalid
+        403:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403'
+          description: |
+            The authentication does not have permissions to access the resource
+            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
+      summary: Create Funding Account
+      tags:
+        - Funding Manager Private
+  /v2/fundingAccounts/{fundingAccountId}:
+    get:
+      description: Get Funding Account by ID
+      operationId: getFundingAccountV2
+      parameters:
+        - in: path
+          name: fundingAccountId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - in: query
+          name: sensitive
+          required: false
+          schema:
+            default: false
+            type: boolean
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingAccountResponseV2'
+          description: Funding Account Response
+        400:
+          description: Bad Request
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+          description: Invalid access token. May be expired or invalid
+        403:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403'
+          description: |
+            The authentication does not have permissions to access the resource
+            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+          description: |
+            The resource was not found or is no longer available
+      summary: Get Funding Account
+      tags:
+        - Funding
   /v1/deltas/fundings:
     get:
       description: Get funding audit deltas for a payor
@@ -5603,7 +5428,55 @@ paths:
             This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
       summary: Get Funding Audit Delta
       tags:
-        - Funding Manager
+        - Funding
+  /v1/fundings/{fundingId}:
+    get:
+      description: Get Funding by Id
+      operationId: getFundingByIdV1
+      parameters:
+        - in: path
+          name: fundingId
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingResponse'
+          description: Funding response
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+          description: Invalid request. See Error message payload for details of failure
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+          description: Invalid access token. May be expired or invalid
+        403:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_403'
+          description: |
+            The authentication does not have permissions to access the resource
+            This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
+        404:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+          description: |
+            The resource was not found or is no longer available
+      summary: Get Funding
+      tags:
+        - Funding
   /v1/paymentaudit/fundings:
     get:
       deprecated: true
@@ -6549,6 +6422,15 @@ paths:
         Get List of payments for Payout, allowing for RETURNED status
       operationId: getPaymentsForPayoutV4
       parameters:
+        - description: |
+            Payout Rails ID filter - case insensitive match.
+            Any value is allowed, but you should use one of the supported railsId values.
+            To get this list of values, you should call the 'Get Supported Rails' endpoint.
+          in: query
+          name: railsId
+          required: false
+          schema:
+            type: string
         - description: The id (UUID) of the payout.
           in: path
           name: payoutId
@@ -6637,6 +6519,7 @@ paths:
             * ACH
             * SAME_DAY_ACH
             * WIRE
+            * GACHO
           in: query
           name: transmissionType
           required: false
@@ -6646,6 +6529,7 @@ paths:
               - SAME_DAY_ACH
               - WIRE
               - LOCAL
+              - GACHO
             type: string
         - description: Page number. Default is 1.
           in: query
@@ -6785,6 +6669,7 @@ paths:
             * ACH
             * SAME_DAY_ACH
             * WIRE
+            * GACHO
           in: query
           name: transmissionType
           required: false
@@ -6794,6 +6679,7 @@ paths:
               - SAME_DAY_ACH
               - WIRE
               - LOCAL
+              - GACHO
             type: string
         - description: The source account name filter. This filters via a case insensitive
             substring match.
@@ -6869,7 +6755,10 @@ paths:
           required: false
           schema:
             type: string
-        - description: Payout Rails ID filter - case insensitive sub-string match
+        - description: |
+            Payout Rails ID filter - case insensitive match.
+            Any value is allowed, but you should use one of the supported railsId values.
+            To get this list of values, you should call the 'Get Supported Rails' endpoint.
           in: query
           name: railsId
           required: false
@@ -6901,6 +6790,22 @@ paths:
               - SCHEDULED
               - EXECUTED
               - FAILED
+            type: string
+        - description: The status of the post instruct FX step if one was required for
+            the payment
+          in: query
+          name: postInstructFxStatus
+          required: false
+          schema:
+            enum:
+              - ANY
+              - INITIATED
+              - CANCELLED
+              - EXECUTED
+              - COMPLETED
+              - RETURNED
+              - RESUBMITTED
+              - REFUNDED
             type: string
         - description: Page number. Default is 1.
           in: query
@@ -7042,6 +6947,12 @@ paths:
           required: true
           schema:
             format: uuid
+            type: string
+        - description: The source account name
+          in: query
+          name: sourceAccountName
+          required: false
+          schema:
             type: string
         - description: Page number. Default is 1.
           in: query
@@ -7289,11 +7200,10 @@ paths:
   /v3/payouts:
     post:
       description: |
-        <p>Create a new payout and return a location header with a link to get the payout.</p>
-        <p>Basic validation of the payout is performed before returning but more comprehensive validation is done asynchronously.</p>
-        <p>The results can be obtained by issuing a HTTP GET to the URL returned in the location header.</p>
-        <p>**NOTE:** amount values in payments must be in 'minor units' format. E.g. cents for USD, pence for GBP etc.</p>
-         with no decimal places.
+        <p>Create a new payout and return a location header with a link to the payout</p>
+        <p>Basic validation of the payout is performed before returning but more comprehensive validation is done asynchronously</p>
+        <p>The results can be obtained by issuing a HTTP GET to the URL returned in the location header</p>
+        <p>**NOTE:** amount values in payments must be in 'minor units' format. E.g. cents for USD, pence for GBP etc with no decimal places</p>
       operationId: submitPayoutV3
       requestBody:
         content:
@@ -7335,10 +7245,13 @@ paths:
         required: true
       responses:
         202:
-          description: Detailed response of payout instructions
+          description: Successful submission of the payout
           headers:
             Location:
               description: Reference to created payout
+              example: |
+                <p>HTTP/1.1 202 Accepted</p>
+                <p>Location: https://api.sandbox.velopayments.com/v3/payouts/04a3299d-afcf-42fb-a8b2-76097daf2b1b</p>
               schema:
                 format: uri
                 type: string
@@ -7364,7 +7277,7 @@ paths:
             This usually occurs when there is a valid authentication instance (client or user) but they do not have the required permissions
       summary: Submit Payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7417,7 +7330,7 @@ paths:
             The resource was not found or is no longer available
       summary: Withdraw Payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7465,7 +7378,7 @@ paths:
             The resource was not found or is no longer available
       summary: Get Payout Summary
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7529,7 +7442,7 @@ paths:
             The request contained data that would result in a duplicate value
       summary: Instruct Payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7571,7 +7484,7 @@ paths:
             The request contained data that would result in a duplicate value
       summary: Create a quote for the payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7678,7 +7591,7 @@ paths:
             The resource was not found or is no longer available
       summary: Retrieve payments for a payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7730,7 +7643,7 @@ paths:
             The request contained data that would result in a duplicate value
       summary: Deschedule a payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7794,7 +7707,7 @@ paths:
             The request contained data that would result in a duplicate value
       summary: Schedule a payout
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7804,6 +7717,7 @@ paths:
                 -d '{"scheduledFor": "2025-01-01T12:00:00Z", "notificationsEnabled": "true"}'
   /v1/paymentChannelRules:
     get:
+      deprecated: true
       description: List the country specific payment channel rules.
       operationId: listPaymentChannelRulesV1
       responses:
@@ -7884,7 +7798,7 @@ paths:
             The resource was not found or is no longer available
       summary: Withdraw a Payment
       tags:
-        - Payout Service
+        - Payouts
       x-code-samples:
         - lang: shell
           source: |
@@ -7917,6 +7831,7 @@ paths:
                 -H 'Authorization: Bearer 9a7c9010-547f-410e-ac3c-fd6f6701c745'
   /v2/supportedCountries:
     get:
+      deprecated: true
       description: List the supported countries.
       operationId: listSupportedCountriesV2
       responses:
@@ -7933,7 +7848,7 @@ paths:
       x-code-samples:
         - lang: shell
           source: |
-            $ curl 'https://api.sandbox.velopayments.com/v1/supportedCountries' -i -X GET
+            $ curl 'https://api.sandbox.velopayments.com/v2/supportedCountries' -i -X GET
   /v2/currencies:
     get:
       description: List the supported currencies.
@@ -8226,17 +8141,16 @@ components:
           type: string
         source:
           description: One of the available set of source event payloads
-          type: object
-#          discriminator:
-#            mapping:
-#              ping: '#/components/schemas/Ping'
-#              payment_status_changed: '#/components/schemas/PaymentStatusChanged'
-#              payment_rejected_or_returned: '#/components/schemas/PaymentRejectedOrReturned'
-#              onboarding_status_changed: '#/components/schemas/OnboardingStatusChanged'
-#              payable_status_changed: '#/components/schemas/PayableStatusChanged'
-#              payee_details_changed: '#/components/schemas/PayeeDetailsChanged'
-#              debit_status_changed: '#/components/schemas/DebitStatusChanged'
-#            propertyName: sourceType
+          discriminator:
+            mapping:
+              ping: '#/components/schemas/Ping'
+              payment_status_changed: '#/components/schemas/PaymentStatusChanged'
+              payment_rejected_or_returned: '#/components/schemas/PaymentRejectedOrReturned'
+              onboarding_status_changed: '#/components/schemas/OnboardingStatusChanged'
+              payable_status_changed: '#/components/schemas/PayableStatusChanged'
+              payee_details_changed: '#/components/schemas/PayeeDetailsChanged'
+              debit_status_changed: '#/components/schemas/DebitStatusChanged'
+            propertyName: sourceType
           example:
             type: payment_status_changed
             eventId: 270ab907-27ec-4b83-8028-0ff432bbdec4
@@ -9438,9 +9352,9 @@ components:
           type: string
         roles:
           description: |
-            <p>A list of roles to assign to the key.</p>
-            <p>Only the first role name will be used</p>
-            <p>A later version will change this from a list to string</p>
+            <p>A role to assign to the key.</p>
+            <p>If you want your API key to have write access then assign the role velo.payor.admin</p>
+            <p>A later version will change this property from a list to string</p>
           example:
             - velo.payor.admin
           items:
@@ -9449,7 +9363,7 @@ components:
               - velo.payor.admin
               - velo.payor.support
             type: string
-          maxItems: 10
+          maxItems: 1
           minItems: 1
           type: array
       required:
@@ -9490,9 +9404,9 @@ components:
     PayorBrandingResponse:
       example:
         supportContact: support@example.com
-        collectiveAlias: Payee
+        collectiveAlias: Contractors
         dbaName: Key West Imports
-        logoUrl: example.com
+        logoUrl: https://images.example.com/450ecb66-df18-4d0c-b557-f718782775df/logo.png
         payorName: Key West Imports, Inc
       properties:
         payorName:
@@ -9500,13 +9414,15 @@ components:
           example: Key West Imports, Inc
           type: string
         logoUrl:
-          description: The URL to use for this payor’s logo
-          example: example.com
+          description: |
+            <p>The URL to use for this payor’s logo</p>
+            <p>This will be an immutable system-generated URL</p>
+          example: https://images.example.com/450ecb66-df18-4d0c-b557-f718782775df/logo.png
           format: uri
           type: string
         collectiveAlias:
           description: How the payor has chosen to refer to payees
-          example: Payee
+          example: Contractors
           nullable: true
           type: string
         supportContact:
@@ -10931,30 +10847,7 @@ components:
     CreatePayeesRequestV4:
       example:
         payees:
-          - payorRefs:
-              - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-                invitationStatusTimestamp: 2019-01-20T09:00:00Z
-                payableStatus: true
-                invitationStatus: invitationStatus
-                payableIssues:
-                  - code: "3"
-                    message: payee-disabled
-                  - code: "3"
-                    message: payee-disabled
-                remoteId: uniqueIdForRemoteEntity
-                paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
-              - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-                invitationStatusTimestamp: 2019-01-20T09:00:00Z
-                payableStatus: true
-                invitationStatus: invitationStatus
-                payableIssues:
-                  - code: "3"
-                    message: payee-disabled
-                  - code: "3"
-                    message: payee-disabled
-                remoteId: uniqueIdForRemoteEntity
-                paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
-            address:
+          - address:
               country: US
               countyOrProvince: FL
               line4: line4
@@ -10979,7 +10872,6 @@ components:
               taxId: "123123123"
               name: ABC Group Plc
               operatingName: ABC Co
-            payeeId: 2aa5d7e0-2ecb-403f-8494-1865ed0454e9
             email: bob@example.com
             remoteId: Remote ID
             paymentChannel:
@@ -10990,30 +10882,7 @@ components:
               iban: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX1234
               currency: USD
               accountNumber: XXXXXX5678
-          - payorRefs:
-              - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-                invitationStatusTimestamp: 2019-01-20T09:00:00Z
-                payableStatus: true
-                invitationStatus: invitationStatus
-                payableIssues:
-                  - code: "3"
-                    message: payee-disabled
-                  - code: "3"
-                    message: payee-disabled
-                remoteId: uniqueIdForRemoteEntity
-                paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
-              - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-                invitationStatusTimestamp: 2019-01-20T09:00:00Z
-                payableStatus: true
-                invitationStatus: invitationStatus
-                payableIssues:
-                  - code: "3"
-                    message: payee-disabled
-                  - code: "3"
-                    message: payee-disabled
-                remoteId: uniqueIdForRemoteEntity
-                paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
-            address:
+          - address:
               country: US
               countyOrProvince: FL
               line4: line4
@@ -11038,7 +10907,6 @@ components:
               taxId: "123123123"
               name: ABC Group Plc
               operatingName: ABC Co
-            payeeId: 2aa5d7e0-2ecb-403f-8494-1865ed0454e9
             email: bob@example.com
             remoteId: Remote ID
             paymentChannel:
@@ -11478,139 +11346,6 @@ components:
             $ref: '#/components/schemas/PayeeDeltaV4'
           type: array
       type: object
-    ListSourceAccountResponse:
-      description: List Source Accounts Response Object
-      example:
-        links:
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-        page:
-          numberOfElements: 1
-          totalPages: 2
-          pageSize: 25
-          page: 1
-          totalElements: 1
-        content:
-          - physicalAccountName: VELO_FBO_MYBANKA_USD
-            accountType: FBO
-            fundingAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            fundingRef: a1b2c3d4
-            balance: 1203489
-            pooled: true
-            name: MyAccountName
-            customerId: Joe Customer
-            physicalAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: USD
-            railsId: BOA_RAIL
-            balanceVisible: true
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          - physicalAccountName: VELO_FBO_MYBANKA_USD
-            accountType: FBO
-            fundingAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            fundingRef: a1b2c3d4
-            balance: 1203489
-            pooled: true
-            name: MyAccountName
-            customerId: Joe Customer
-            physicalAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: USD
-            railsId: BOA_RAIL
-            balanceVisible: true
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-      properties:
-        page:
-          $ref: '#/components/schemas/ListSourceAccountResponse_page'
-        links:
-          items:
-            $ref: '#/components/schemas/ListSourceAccountResponse_links'
-          type: array
-        content:
-          items:
-            $ref: '#/components/schemas/SourceAccountResponse'
-          type: array
-      type: object
-    SourceAccountResponse:
-      example:
-        physicalAccountName: VELO_FBO_MYBANKA_USD
-        accountType: FBO
-        fundingAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        fundingRef: a1b2c3d4
-        balance: 1203489
-        pooled: true
-        name: MyAccountName
-        customerId: Joe Customer
-        physicalAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        currency: USD
-        railsId: BOA_RAIL
-        balanceVisible: true
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-      properties:
-        id:
-          description: Source Account Id
-          format: uuid
-          type: string
-        balance:
-          description: Decimal implied
-          example: 1203489
-          format: int64
-          type: integer
-        currency:
-          example: USD
-          maxLength: 3
-          minLength: 3
-          type: string
-        fundingRef:
-          example: a1b2c3d4
-          type: string
-        physicalAccountName:
-          example: VELO_FBO_MYBANKA_USD
-          type: string
-        railsId:
-          example: BOA_RAIL
-          type: string
-        payorId:
-          format: uuid
-          type: string
-        name:
-          example: MyAccountName
-          type: string
-        pooled:
-          type: boolean
-        balanceVisible:
-          type: boolean
-        customerId:
-          example: Joe Customer
-          nullable: true
-          type: string
-        physicalAccountId:
-          format: uuid
-          type: string
-        fundingAccountId:
-          format: uuid
-          nullable: true
-          type: string
-        accountType:
-          example: FBO
-          type: string
-      type: object
-    FundingRequestV1:
-      example:
-        amount: 800828191
-      properties:
-        amount:
-          description: Amount to fund, decimal implied
-          format: int64
-          maximum: 9999999999
-          minimum: 1
-          type: integer
-      required:
-        - amount
-      type: object
     SetNotificationsRequest:
       example:
         minimumBalance: 800828190
@@ -11812,279 +11547,6 @@ components:
         - amount
         - currency
         - toSourceAccountId
-      type: object
-    ListFundingAccountsResponse:
-      description: List Source Accounts Response Object
-      example:
-        links:
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-        page:
-          numberOfElements: 1
-          totalPages: 2
-          pageSize: 25
-          page: 1
-          totalElements: 1
-        content:
-          - routingNumber: 1.2345678E7
-            country: US
-            accountName: Payor Corp
-            name: My Funding Account
-            sourceAccountIds:
-              - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-              - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: USD
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            accountNumber: "7001001234"
-            type: FBO
-          - routingNumber: 1.2345678E7
-            country: US
-            accountName: Payor Corp
-            name: My Funding Account
-            sourceAccountIds:
-              - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-              - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: USD
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            accountNumber: "7001001234"
-            type: FBO
-      properties:
-        page:
-          $ref: '#/components/schemas/ListSourceAccountResponse_page'
-        links:
-          items:
-            $ref: '#/components/schemas/ListSourceAccountResponse_links'
-          type: array
-        content:
-          items:
-            $ref: '#/components/schemas/FundingAccountResponse'
-          type: array
-      type: object
-    FundingAccountResponse:
-      example:
-        routingNumber: 1.2345678E7
-        country: US
-        accountName: Payor Corp
-        name: My Funding Account
-        sourceAccountIds:
-          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        currency: USD
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        accountNumber: "7001001234"
-        type: FBO
-      properties:
-        id:
-          description: Funding Account Id
-          format: uuid
-          type: string
-        payorId:
-          format: uuid
-          type: string
-        accountName:
-          description: name on the bank account
-          example: Payor Corp
-          type: string
-        accountNumber:
-          description: bank account number
-          example: "7001001234"
-          type: string
-        routingNumber:
-          description: bank account routing number
-          example: 1.2345678E7
-          type: string
-        sourceAccountIds:
-          items:
-            format: uuid
-            type: string
-          type: array
-        name:
-          description: name of funding account
-          example: My Funding Account
-          type: string
-        currency:
-          description: ISO 4217 currency code
-          example: USD
-          maxLength: 3
-          minLength: 3
-          type: string
-        country:
-          description: ISO 3166-1 2 letter country code (upper case)
-          example: US
-          maxLength: 2
-          minLength: 2
-          type: string
-        type:
-          description: Funding account type
-          example: FBO
-          type: string
-      type: object
-    FundingAccountTypeV2:
-      description: 'Funding account type. One of the following values: FBO, WUBS_DECOUPLED,
-        PRIVATE'
-      example: FBO
-      type: string
-    ListFundingAccountsResponseV2:
-      description: List Funding Accounts Response Object
-      example:
-        links:
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-          - rel: first
-            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-        page:
-          numberOfElements: 1
-          totalPages: 2
-          pageSize: 25
-          page: 1
-          totalElements: 1
-        content:
-          - routingNumber: 1.2345678E7
-            country: US
-            archived: true
-            accountName: Payor Corp
-            name: My Funding Account
-            currency: USD
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            accountNumber: "7001001234"
-            type: FBO
-          - routingNumber: 1.2345678E7
-            country: US
-            archived: true
-            accountName: Payor Corp
-            name: My Funding Account
-            currency: USD
-            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            accountNumber: "7001001234"
-            type: FBO
-      properties:
-        page:
-          $ref: '#/components/schemas/ListSourceAccountResponse_page'
-        links:
-          items:
-            $ref: '#/components/schemas/ListSourceAccountResponse_links'
-          type: array
-        content:
-          items:
-            $ref: '#/components/schemas/FundingAccountResponseV2'
-          type: array
-      type: object
-    CreateFundingAccountRequestV2:
-      example:
-        routingNumber: routingNumber
-        accountName: accountName
-        name: name
-        currency: USD
-        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        type: FBO
-        accountNumber: accountNumber
-      properties:
-        type:
-          enum:
-            - FBO
-            - WUBS_DECOUPLED
-            - PRIVATE
-          type: string
-        name:
-          maxLength: 30
-          minLength: 3
-          type: string
-        payorId:
-          format: uuid
-          type: string
-        accountName:
-          description: Required if type is FBO
-          maxLength: 22
-          minLength: 1
-          type: string
-        accountNumber:
-          description: Required if type is FBO
-          maxLength: 17
-          minLength: 4
-          type: string
-        routingNumber:
-          description: Required if type is FBO
-          maxLength: 9
-          minLength: 7
-          type: string
-        currency:
-          description: ISO 4217 currency code, Required if type is WUBS_DECOUPLED
-          example: USD
-          maxLength: 3
-          minLength: 3
-          type: string
-      required:
-        - name
-        - payorId
-        - type
-      type: object
-    FundingAccountResponseV2:
-      example:
-        routingNumber: 1.2345678E7
-        country: US
-        archived: true
-        accountName: Payor Corp
-        name: My Funding Account
-        currency: USD
-        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        accountNumber: "7001001234"
-        type: FBO
-      properties:
-        id:
-          description: Funding Account Id
-          format: uuid
-          type: string
-        payorId:
-          format: uuid
-          type: string
-        accountName:
-          description: name on the bank account
-          example: Payor Corp
-          type: string
-        accountNumber:
-          description: bank account number
-          example: "7001001234"
-          type: string
-        routingNumber:
-          description: bank account routing number
-          example: 1.2345678E7
-          type: string
-        name:
-          description: name of funding account
-          example: My Funding Account
-          type: string
-        currency:
-          description: Valid ISO 4217 3 letter currency code. See the <a href="https://www.iso.org/iso-4217-currency-codes.html"
-            target="_blank" a>ISO specification</a> for details.
-          example: USD
-          maxLength: 3
-          minLength: 3
-          pattern: ^[A-Z]{3}$
-          title: ISO Currency Code
-          type: string
-        country:
-          description: ISO 3166-1 2 letter country code (upper case)
-          example: US
-          maxLength: 2
-          minLength: 2
-          type: string
-        type:
-          description: 'Funding account type. One of the following values: FBO, WUBS_DECOUPLED,
-            PRIVATE'
-          example: FBO
-          type: string
-        archived:
-          description: A flag for whether the funding account has been archived.  Only
-            present in the response if true.
-          type: boolean
       type: object
     FundingRequestV3:
       example:
@@ -12318,6 +11780,182 @@ components:
         - currency
         - toSourceAccountId
       type: object
+    SetNotificationsRequest_2:
+      properties:
+        minimumBalance:
+          description: Amount to set as minimum balance for notifications in minor
+            units
+          example: 10000000
+          format: int64
+          maximum: 9999999999
+          minimum: 0
+          type: integer
+      required:
+        - minimumBalance
+      type: object
+    FundingAccountTypeV2:
+      description: 'Funding account type. One of the following values: FBO, WUBS_DECOUPLED,
+        PRIVATE'
+      example: FBO
+      type: string
+    ListFundingAccountsResponseV2:
+      description: List Funding Accounts Response Object
+      example:
+        links:
+          - rel: first
+            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+          - rel: first
+            href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+        page:
+          numberOfElements: 1
+          totalPages: 2
+          pageSize: 25
+          page: 1
+          totalElements: 1
+        content:
+          - routingNumber: 1.2345678E7
+            country: US
+            archived: true
+            accountName: Payor Corp
+            name: My Funding Account
+            currency: USD
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            accountNumber: "7001001234"
+            type: FBO
+          - routingNumber: 1.2345678E7
+            country: US
+            archived: true
+            accountName: Payor Corp
+            name: My Funding Account
+            currency: USD
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            accountNumber: "7001001234"
+            type: FBO
+      properties:
+        page:
+          $ref: '#/components/schemas/ListFundingAccountsResponseV2_page'
+        links:
+          items:
+            $ref: '#/components/schemas/ListFundingAccountsResponseV2_links'
+          type: array
+        content:
+          items:
+            $ref: '#/components/schemas/FundingAccountResponseV2'
+          type: array
+      type: object
+    CreateFundingAccountRequestV2:
+      example:
+        routingNumber: routingNumber
+        accountName: accountName
+        name: name
+        currency: USD
+        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: FBO
+        accountNumber: accountNumber
+      properties:
+        type:
+          enum:
+            - FBO
+            - WUBS_DECOUPLED
+            - PRIVATE
+          type: string
+        name:
+          maxLength: 30
+          minLength: 3
+          type: string
+        payorId:
+          format: uuid
+          type: string
+        accountName:
+          description: Required if type is either FBO or PRIVATE
+          maxLength: 22
+          minLength: 1
+          type: string
+        accountNumber:
+          description: Required if type is either FBO or PRIVATE
+          maxLength: 17
+          minLength: 4
+          type: string
+        routingNumber:
+          description: Required if type is either FBO or PRIVATE
+          maxLength: 9
+          minLength: 6
+          type: string
+        currency:
+          description: ISO 4217 currency code, Required if type is either WUBS_DECOUPLED
+            or PRIVATE
+          example: USD
+          maxLength: 3
+          minLength: 3
+          type: string
+      required:
+        - name
+        - payorId
+        - type
+      type: object
+    FundingAccountResponseV2:
+      example:
+        routingNumber: 1.2345678E7
+        country: US
+        archived: true
+        accountName: Payor Corp
+        name: My Funding Account
+        currency: USD
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        accountNumber: "7001001234"
+        type: FBO
+      properties:
+        id:
+          description: Funding Account Id
+          format: uuid
+          type: string
+        payorId:
+          format: uuid
+          type: string
+        accountName:
+          description: name on the bank account
+          example: Payor Corp
+          type: string
+        accountNumber:
+          description: bank account number
+          example: "7001001234"
+          type: string
+        routingNumber:
+          description: bank account routing number
+          example: 1.2345678E7
+          type: string
+        name:
+          description: name of funding account
+          example: My Funding Account
+          type: string
+        currency:
+          description: Valid ISO 4217 3 letter currency code. See the <a href="https://www.iso.org/iso-4217-currency-codes.html"
+            target="_blank" a>ISO specification</a> for details.
+          example: USD
+          maxLength: 3
+          minLength: 3
+          pattern: ^[A-Z]{3}$
+          title: ISO Currency Code
+          type: string
+        country:
+          description: ISO 3166-1 2 letter country code (upper case)
+          example: US
+          maxLength: 2
+          minLength: 2
+          type: string
+        type:
+          description: 'Funding account type. One of the following values: FBO, WUBS_DECOUPLED,
+            PRIVATE'
+          example: FBO
+          type: string
+        archived:
+          description: A flag for whether the funding account has been archived.  Only
+            present in the response if true.
+          type: boolean
+      type: object
     PageResourceFundingPayorStatusAuditResponseFundingPayorStatusAuditResponse:
       example:
         links:
@@ -12354,6 +11992,82 @@ components:
           items:
             $ref: '#/components/schemas/FundingPayorStatusAuditResponse'
           type: array
+      type: object
+    FundingResponse:
+      example:
+        physicalAccountName: physicalAccountName
+        allocationDate: 2000-01-23T04:56:07.000+00:00
+        reason: reason
+        amount: 0
+        sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        fundingId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        fundingAccountType: FBO
+        detectedFundingRef: detectedFundingRef
+        allocationType: allocationType
+        hiddenDate: 2000-01-23T04:56:07.000+00:00
+        currency: USD
+        payorId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        text: text
+        status: ALLOCATED
+      properties:
+        fundingId:
+          format: uuid
+          type: string
+        payorId:
+          format: uuid
+          type: string
+        allocationDate:
+          format: date-time
+          type: string
+        detectedFundingRef:
+          type: string
+        amount:
+          format: int64
+          type: integer
+        currency:
+          description: Valid ISO 4217 3 letter currency code. See the <a href="https://www.iso.org/iso-4217-currency-codes.html"
+            target="_blank" a>ISO specification</a> for details.
+          example: USD
+          maxLength: 3
+          minLength: 3
+          pattern: ^[A-Z]{3}$
+          title: ISO Currency Code
+          type: string
+        text:
+          type: string
+        physicalAccountName:
+          type: string
+        sourceAccountId:
+          format: uuid
+          type: string
+        allocationType:
+          description: 'Funding Allocation Type. One of the following values: AUTOMATIC,
+            MANUAL'
+          type: string
+        reason:
+          type: string
+        hiddenDate:
+          format: date-time
+          type: string
+        fundingAccountType:
+          description: 'Funding Account Type. One of the following values: FBO, WUBS_DECOUPLED,
+            PRIVATE'
+          example: FBO
+          type: string
+        status:
+          description: 'Current status of the funding. One of the follwing values:
+            PENDING, UNALLOCATED, ALLOCATED, HIDDEN, RETURNED, RETURNING, BULK_RETURN,
+            OTHER'
+          example: ALLOCATED
+          type: string
+      required:
+        - allocationDate
+        - amount
+        - currency
+        - fundingAccountType
+        - fundingId
+        - payorId
+        - status
       type: object
     GetFundingsResponse:
       description: List Users Response Object
@@ -13213,19 +12927,19 @@ components:
           - dateTime: 2000-01-23T04:56:07.000+00:00
             sourceAccountSummary:
               - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                currency: currency
+                currency: EUR
                 totalCost: 3344
               - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                currency: currency
+                currency: EUR
                 totalCost: 3344
             payoutType: payoutType
             totalReturnedPayments: 1
             fxSummaries:
               - invertedRate: 123.23
                 rate: 123.23
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 totalPaymentAmount: 34235
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 totalCost: 5
                 fundingStatus: fundingStatus
@@ -13233,9 +12947,9 @@ components:
                 status: status
               - invertedRate: 123.23
                 rate: 123.23
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 totalPaymentAmount: 34235
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 totalCost: 5
                 fundingStatus: fundingStatus
@@ -13262,19 +12976,19 @@ components:
           - dateTime: 2000-01-23T04:56:07.000+00:00
             sourceAccountSummary:
               - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                currency: currency
+                currency: EUR
                 totalCost: 3344
               - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-                currency: currency
+                currency: EUR
                 totalCost: 3344
             payoutType: payoutType
             totalReturnedPayments: 1
             fxSummaries:
               - invertedRate: 123.23
                 rate: 123.23
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 totalPaymentAmount: 34235
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 totalCost: 5
                 fundingStatus: fundingStatus
@@ -13282,9 +12996,9 @@ components:
                 status: status
               - invertedRate: 123.23
                 rate: 123.23
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 totalPaymentAmount: 34235
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 totalCost: 5
                 fundingStatus: fundingStatus
@@ -13408,7 +13122,7 @@ components:
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13418,12 +13132,12 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13433,7 +13147,7 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
             railsPaymentId: railsPaymentId
             payeeAddressCountryCode: US
@@ -13444,13 +13158,18 @@ components:
             paymentMetadata: sample metadata
             payorPaymentId: 123123asdf
             remoteSystemId: REMOTE_SYSTEM_ID
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             rejectionReason: rejectionReason
             paymentTrackingReference: paymentTrackingReference
             status: status
+            postInstructFxInfo:
+              fxStatus: INITIATED
+              fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+              fxTransactionReference: AB123GHI
+              fxMode: MANUAL
             accountName: My Account Name
             remoteSystemPaymentId: remoteSystemPaymentId
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             paymentMemo: Payment memo
             paymentAmount: 7
             fundingStatus: fundingStatus
@@ -13506,7 +13225,7 @@ components:
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13516,12 +13235,12 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13531,7 +13250,7 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
             railsPaymentId: railsPaymentId
             payeeAddressCountryCode: US
@@ -13542,13 +13261,18 @@ components:
             paymentMetadata: sample metadata
             payorPaymentId: 123123asdf
             remoteSystemId: REMOTE_SYSTEM_ID
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             rejectionReason: rejectionReason
             paymentTrackingReference: paymentTrackingReference
             status: status
+            postInstructFxInfo:
+              fxStatus: INITIATED
+              fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+              fxTransactionReference: AB123GHI
+              fxMode: MANUAL
             accountName: My Account Name
             remoteSystemPaymentId: remoteSystemPaymentId
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             paymentMemo: Payment memo
             paymentAmount: 7
             fundingStatus: fundingStatus
@@ -13633,7 +13357,7 @@ components:
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13643,12 +13367,12 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13658,7 +13382,7 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
             railsPaymentId: railsPaymentId
             payeeAddressCountryCode: US
@@ -13669,13 +13393,18 @@ components:
             paymentMetadata: sample metadata
             payorPaymentId: 123123asdf
             remoteSystemId: REMOTE_SYSTEM_ID
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             rejectionReason: rejectionReason
             paymentTrackingReference: paymentTrackingReference
             status: status
+            postInstructFxInfo:
+              fxStatus: INITIATED
+              fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+              fxTransactionReference: AB123GHI
+              fxMode: MANUAL
             accountName: My Account Name
             remoteSystemPaymentId: remoteSystemPaymentId
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             paymentMemo: Payment memo
             paymentAmount: 7
             fundingStatus: fundingStatus
@@ -13731,7 +13460,7 @@ components:
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13741,12 +13470,12 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
               - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
                 eventDateTime: 2000-01-23T04:56:07.000+00:00
                 accountName: accountName
-                sourceCurrency: sourceCurrency
+                sourceCurrency: EUR
                 eventType: eventType
                 accountNumber: accountNumber
                 paymentAmount: 1299
@@ -13756,7 +13485,7 @@ components:
                 scheduledFor: 2000-01-23T04:56:07.000+00:00
                 sourceAmount: 1299
                 scheduledBy: Aphra Behn
-                paymentCurrency: paymentCurrency
+                paymentCurrency: EUR
                 scheduledAt: 2000-01-23T04:56:07.000+00:00
             railsPaymentId: railsPaymentId
             payeeAddressCountryCode: US
@@ -13767,13 +13496,18 @@ components:
             paymentMetadata: sample metadata
             payorPaymentId: 123123asdf
             remoteSystemId: REMOTE_SYSTEM_ID
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             rejectionReason: rejectionReason
             paymentTrackingReference: paymentTrackingReference
             status: status
+            postInstructFxInfo:
+              fxStatus: INITIATED
+              fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+              fxTransactionReference: AB123GHI
+              fxMode: MANUAL
             accountName: My Account Name
             remoteSystemPaymentId: remoteSystemPaymentId
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             paymentMemo: Payment memo
             paymentAmount: 7
             fundingStatus: fundingStatus
@@ -13843,7 +13577,7 @@ components:
           - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
             eventDateTime: 2000-01-23T04:56:07.000+00:00
             accountName: accountName
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             eventType: eventType
             accountNumber: accountNumber
             paymentAmount: 1299
@@ -13853,12 +13587,12 @@ components:
             scheduledFor: 2000-01-23T04:56:07.000+00:00
             sourceAmount: 1299
             scheduledBy: Aphra Behn
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             scheduledAt: 2000-01-23T04:56:07.000+00:00
           - eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
             eventDateTime: 2000-01-23T04:56:07.000+00:00
             accountName: accountName
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             eventType: eventType
             accountNumber: accountNumber
             paymentAmount: 1299
@@ -13868,7 +13602,7 @@ components:
             scheduledFor: 2000-01-23T04:56:07.000+00:00
             sourceAmount: 1299
             scheduledBy: Aphra Behn
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             scheduledAt: 2000-01-23T04:56:07.000+00:00
         railsPaymentId: railsPaymentId
         payeeAddressCountryCode: US
@@ -13879,13 +13613,18 @@ components:
         paymentMetadata: sample metadata
         payorPaymentId: 123123asdf
         remoteSystemId: REMOTE_SYSTEM_ID
-        paymentCurrency: paymentCurrency
+        paymentCurrency: EUR
         rejectionReason: rejectionReason
         paymentTrackingReference: paymentTrackingReference
         status: status
+        postInstructFxInfo:
+          fxStatus: INITIATED
+          fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          fxTransactionReference: AB123GHI
+          fxMode: MANUAL
         accountName: My Account Name
         remoteSystemPaymentId: remoteSystemPaymentId
-        sourceCurrency: sourceCurrency
+        sourceCurrency: EUR
         paymentMemo: Payment memo
         paymentAmount: 7
         fundingStatus: fundingStatus
@@ -13964,7 +13703,8 @@ components:
           example: 12345
           type: integer
         sourceCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -13972,7 +13712,8 @@ components:
           description: The amount which the payee will receive
           type: integer
         paymentCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -14085,7 +13826,7 @@ components:
           type: string
         transmissionType:
           description: The transmission type of the payment, e.g. ACH, SAME_DAY_ACH,
-            WIRE
+            WIRE, GACHO
           type: string
         paymentTrackingReference:
           type: string
@@ -14095,6 +13836,8 @@ components:
           type: string
         schedule:
           $ref: '#/components/schemas/PayoutSchedule'
+        postInstructFxInfo:
+          $ref: '#/components/schemas/PostInstructFxInfo'
         payout:
           $ref: '#/components/schemas/PaymentResponseV4_payout'
       required:
@@ -14317,7 +14060,7 @@ components:
         sourceAccountName: MyAccountName
       properties:
         remoteId:
-          description: Your identifier for payee
+          description: Your identifier for the payee
           example: remoteId1234
           maxLength: 100
           minLength: 1
@@ -14395,108 +14138,116 @@ components:
         rejectedPayments:
           - currencyType: USD
             reason: The payee has not been onboarded
-            amount: 1234
+            amount: 10000
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-            payorPaymentId: paymenIdVal123123
-            reasonCode: PAYMENT_VALUE_TOO_HIGH
-            remoteSystemId: Remote_System_Id_101234
-            lineNumber: 10
+            payorPaymentId: 123211321ABSD
+            reasonCode: VE1012
+            remoteSystemId: OB012
+            lineNumber: 34
             message: Payment cannot be processed because of the Payee's OFAC or Compliance
               Status
             remoteId: remoteIdVal123
-            sourceAccountName: Chase
+            sourceAccountName: Chase Bank Account
           - currencyType: USD
             reason: The payee has not been onboarded
-            amount: 1234
+            amount: 10000
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-            payorPaymentId: paymenIdVal123123
-            reasonCode: PAYMENT_VALUE_TOO_HIGH
-            remoteSystemId: Remote_System_Id_101234
-            lineNumber: 10
+            payorPaymentId: 123211321ABSD
+            reasonCode: VE1012
+            remoteSystemId: OB012
+            lineNumber: 34
             message: Payment cannot be processed because of the Payee's OFAC or Compliance
               Status
             remoteId: remoteIdVal123
-            sourceAccountName: Chase
+            sourceAccountName: Chase Bank Account
         schedule:
           scheduledFor: 2000-01-23T04:56:07.000+00:00
           scheduleStatus: SCHEDULED
           notificationsEnabled: true
           scheduledByPrincipalId: 8946953b-1e3b-49cf-9da4-b704cbb78f3e
           scheduledAt: 2000-01-23T04:56:07.000+00:00
-        paymentsRejected: 0
+        paymentsRejected: 1
         paymentsSubmitted: 10
         paymentsWithdrawn: 0
         fxSummaries:
           - invertedRate: 1.12
-            creationTime: 2000-01-23T04:56:07.000+00:00
-            rate: 1.12
-            expiryTime: 2000-01-23T04:56:07.000+00:00
+            creationTime: 2022-10-30T09:45:09Z
+            rate: 0.89
+            expiryTime: 2022-10-30T09:50:09Z
             sourceCurrency: USD
-            totalPaymentAmount: 1234
+            totalPaymentAmount: 890000
             paymentCurrency: USD
-            quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            totalSourceAmount: 1234
+            quoteId: af80d455-29dd-4e72-a000-495a9829a7d0
+            totalSourceAmount: 1000000
             fundingStatus: FUNDED
             status: QUOTED
           - invertedRate: 1.12
-            creationTime: 2000-01-23T04:56:07.000+00:00
-            rate: 1.12
-            expiryTime: 2000-01-23T04:56:07.000+00:00
+            creationTime: 2022-10-30T09:45:09Z
+            rate: 0.89
+            expiryTime: 2022-10-30T09:50:09Z
             sourceCurrency: USD
-            totalPaymentAmount: 1234
+            totalPaymentAmount: 890000
             paymentCurrency: USD
-            quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            totalSourceAmount: 1234
+            quoteId: af80d455-29dd-4e72-a000-495a9829a7d0
+            totalSourceAmount: 1000000
             fundingStatus: FUNDED
             status: QUOTED
         accounts:
-          - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - sourceAccountId: cf81e490-4ab8-49c2-bd68-9d1e725480cb
             currency: USD
-            totalPayoutCost: 1231200
+            totalPayoutCost: 1000000
             sourceAccountName: AccountName
-          - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - sourceAccountId: cf81e490-4ab8-49c2-bd68-9d1e725480cb
             currency: USD
-            totalPayoutCost: 1231200
+            totalPayoutCost: 1000000
             sourceAccountName: AccountName
-        payoutId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        payoutId: cf81e490-4ab8-49c2-bd68-9d1e725480cb
         acceptedPayments:
           - currencyType: USD
-            amount: 1234
+            amount: 10000
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-            payorPaymentId: paymenIdVal123123
-            railsId: WU
-            paymentMemo: Payment memo
-            remoteSystemId: Remote_System_Id_101234
-            remoteId: remoteIdVal123
-            sourceAccountName: Chase
+            payorPaymentId: 123211321ABSD
+            railsId: SVB
+            paymentMemo: INV00112
+            remoteSystemId: OB012
+            remoteId: remoteId1234
+            sourceAccountName: Chase Bank Account
           - currencyType: USD
-            amount: 1234
+            amount: 10000
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-            payorPaymentId: paymenIdVal123123
-            railsId: WU
-            paymentMemo: Payment memo
-            remoteSystemId: Remote_System_Id_101234
-            remoteId: remoteIdVal123
-            sourceAccountName: Chase
+            payorPaymentId: 123211321ABSD
+            railsId: SVB
+            paymentMemo: INV00112
+            remoteSystemId: OB012
+            remoteId: remoteId1234
+            sourceAccountName: Chase Bank Account
         status: COMPLETED
-        paymentsAccepted: 10
+        paymentsAccepted: 9
       properties:
         payoutId:
+          description: The id of the payout
+          example: cf81e490-4ab8-49c2-bd68-9d1e725480cb
           format: uuid
           type: string
         status:
+          description: The status of the payout (one of SUBMITTED, ACCEPTED, REJECTED,
+            QUOTED, INSTRUCTED, COMPLETED, INCOMPLETE, WITHDRAWN)
           example: COMPLETED
           type: string
         paymentsSubmitted:
+          description: The number of payments that were submitted in the payout
           example: 10
           type: integer
         paymentsAccepted:
-          example: 10
+          description: The number of payments that were accepted in the payout
+          example: 9
           type: integer
         paymentsRejected:
-          example: 0
+          description: The number of payments that were rejected in the payout
+          example: 1
           type: integer
         paymentsWithdrawn:
+          description: The number of payments that were withdrawn in the payout
           example: 0
           type: integer
         fxSummaries:
@@ -14538,25 +14289,25 @@ components:
       example:
         fxSummaries:
           - invertedRate: 1.12
-            creationTime: 2000-01-23T04:56:07.000+00:00
-            rate: 1.12
-            expiryTime: 2000-01-23T04:56:07.000+00:00
+            creationTime: 2022-10-30T09:45:09Z
+            rate: 0.89
+            expiryTime: 2022-10-30T09:50:09Z
             sourceCurrency: USD
-            totalPaymentAmount: 1234
+            totalPaymentAmount: 890000
             paymentCurrency: USD
-            quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            totalSourceAmount: 1234
+            quoteId: af80d455-29dd-4e72-a000-495a9829a7d0
+            totalSourceAmount: 1000000
             fundingStatus: FUNDED
             status: QUOTED
           - invertedRate: 1.12
-            creationTime: 2000-01-23T04:56:07.000+00:00
-            rate: 1.12
-            expiryTime: 2000-01-23T04:56:07.000+00:00
+            creationTime: 2022-10-30T09:45:09Z
+            rate: 0.89
+            expiryTime: 2022-10-30T09:50:09Z
             sourceCurrency: USD
-            totalPaymentAmount: 1234
+            totalPaymentAmount: 890000
             paymentCurrency: USD
-            quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            totalSourceAmount: 1234
+            quoteId: af80d455-29dd-4e72-a000-495a9829a7d0
+            totalSourceAmount: 1000000
             fundingStatus: FUNDED
             status: QUOTED
       properties:
@@ -14580,8 +14331,8 @@ components:
           page: 5
           totalElements: 6
         content:
-          - amount: 1234
-            paymentMemo: Payment memo
+          - amount: 10000
+            paymentMemo: INV00112
             remoteId: remoteIdVal123
             payee:
               individual:
@@ -14591,19 +14342,19 @@ components:
               company:
                 companyName: ACME Anvils PLC
               payeeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            paymentId: paymentId
+            paymentId: 859af785-223b-4d5b-a708-5fa57f006dbb
             withdrawable: false
             autoWithdrawnReasonCode: VE0003
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
             currency: USD
-            payorPaymentId: paymenIdVal123123
-            transmissionType: transmissionType
-            railsId: WU
-            remoteSystemId: Remote_System_Id_101234
-            sourceAccountName: Chase
-            status: status
-          - amount: 1234
-            paymentMemo: Payment memo
+            payorPaymentId: 123211321ABSD
+            transmissionType: LOCAL
+            railsId: SVB
+            remoteSystemId: OB012
+            sourceAccountName: Chase Bank Account
+            status: AWAITING_FUNDS
+          - amount: 10000
+            paymentMemo: INV00112
             remoteId: remoteIdVal123
             payee:
               individual:
@@ -14613,17 +14364,17 @@ components:
               company:
                 companyName: ACME Anvils PLC
               payeeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            paymentId: paymentId
+            paymentId: 859af785-223b-4d5b-a708-5fa57f006dbb
             withdrawable: false
             autoWithdrawnReasonCode: VE0003
             paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
             currency: USD
-            payorPaymentId: paymenIdVal123123
-            transmissionType: transmissionType
-            railsId: WU
-            remoteSystemId: Remote_System_Id_101234
-            sourceAccountName: Chase
-            status: status
+            payorPaymentId: 123211321ABSD
+            transmissionType: LOCAL
+            railsId: SVB
+            remoteSystemId: OB012
+            sourceAccountName: Chase Bank Account
+            status: AWAITING_FUNDS
       properties:
         page:
           $ref: '#/components/schemas/PagedPayeeInvitationStatusResponseV3_page'
@@ -14662,6 +14413,8 @@ components:
               - displayName: Account Name
                 minLength: 5
                 displayOrder: 0
+                description: The bank branch, account number prefix and account number
+                  suffix; with hyphen separators.
                 required: true
                 maxLength: 50
                 validation: ^[0-9]{6,11}$
@@ -14669,6 +14422,8 @@ components:
               - displayName: Account Name
                 minLength: 5
                 displayOrder: 0
+                description: The bank branch, account number prefix and account number
+                  suffix; with hyphen separators.
                 required: true
                 maxLength: 50
                 validation: ^[0-9]{6,11}$
@@ -14678,6 +14433,8 @@ components:
               - displayName: Account Name
                 minLength: 5
                 displayOrder: 0
+                description: The bank branch, account number prefix and account number
+                  suffix; with hyphen separators.
                 required: true
                 maxLength: 50
                 validation: ^[0-9]{6,11}$
@@ -14685,6 +14442,8 @@ components:
               - displayName: Account Name
                 minLength: 5
                 displayOrder: 0
+                description: The bank branch, account number prefix and account number
+                  suffix; with hyphen separators.
                 required: true
                 maxLength: 50
                 validation: ^[0-9]{6,11}$
@@ -16073,29 +15832,6 @@ components:
       type: object
     CreatePayeeV4:
       example:
-        payorRefs:
-          - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-            invitationStatusTimestamp: 2019-01-20T09:00:00Z
-            payableStatus: true
-            invitationStatus: invitationStatus
-            payableIssues:
-              - code: "3"
-                message: payee-disabled
-              - code: "3"
-                message: payee-disabled
-            remoteId: uniqueIdForRemoteEntity
-            paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
-          - payorId: ba08877f-9d96-41e4-9c26-44a872d856ae
-            invitationStatusTimestamp: 2019-01-20T09:00:00Z
-            payableStatus: true
-            invitationStatus: invitationStatus
-            payableIssues:
-              - code: "3"
-                message: payee-disabled
-              - code: "3"
-                message: payee-disabled
-            remoteId: uniqueIdForRemoteEntity
-            paymentChannelId: 70faaff7-2c32-4b44-b27f-f0b6c484e6f3
         address:
           country: US
           countyOrProvince: FL
@@ -16121,7 +15857,6 @@ components:
           taxId: "123123123"
           name: ABC Group Plc
           operatingName: ABC Co
-        payeeId: 2aa5d7e0-2ecb-403f-8494-1865ed0454e9
         email: bob@example.com
         remoteId: Remote ID
         paymentChannel:
@@ -16133,17 +15868,6 @@ components:
           currency: USD
           accountNumber: XXXXXX5678
       properties:
-        payeeId:
-          example: 2aa5d7e0-2ecb-403f-8494-1865ed0454e9
-          format: uuid
-          readOnly: true
-          type: string
-        payorRefs:
-          items:
-            $ref: '#/components/schemas/PayeePayorRefV4'
-          nullable: true
-          readOnly: true
-          type: array
         email:
           example: bob@example.com
           format: email
@@ -16471,6 +16195,20 @@ components:
         status:
           type: string
       type: object
+    AllocationType:
+      description: 'Funding Allocation Type. One of the following values: AUTOMATIC,
+        MANUAL'
+      type: string
+    FundingAccountType:
+      description: 'Funding Account Type. One of the following values: FBO, WUBS_DECOUPLED,
+        PRIVATE'
+      example: FBO
+      type: string
+    FundingStatus:
+      description: 'Current status of the funding. One of the follwing values: PENDING,
+        UNALLOCATED, ALLOCATED, HIDDEN, RETURNED, RETURNING, BULK_RETURN, OTHER'
+      example: ALLOCATED
+      type: string
     FundingAudit:
       example:
         dateTime: 2000-01-23T04:56:07.000+00:00
@@ -16733,19 +16471,19 @@ components:
         dateTime: 2000-01-23T04:56:07.000+00:00
         sourceAccountSummary:
           - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: currency
+            currency: EUR
             totalCost: 3344
           - sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-            currency: currency
+            currency: EUR
             totalCost: 3344
         payoutType: payoutType
         totalReturnedPayments: 1
         fxSummaries:
           - invertedRate: 123.23
             rate: 123.23
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             totalPaymentAmount: 34235
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
             totalCost: 5
             fundingStatus: fundingStatus
@@ -16753,9 +16491,9 @@ components:
             status: status
           - invertedRate: 123.23
             rate: 123.23
-            sourceCurrency: sourceCurrency
+            sourceCurrency: EUR
             totalPaymentAmount: 34235
-            paymentCurrency: paymentCurrency
+            paymentCurrency: EUR
             quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
             totalCost: 5
             fundingStatus: fundingStatus
@@ -16933,7 +16671,8 @@ components:
         - scheduledFor
       type: object
     PaymentAuditCurrency:
-      description: ISO 3 character currency code
+      description: ISO-4217 3 character currency code
+      example: EUR
       maxLength: 3
       minLength: 3
       type: string
@@ -16942,7 +16681,7 @@ components:
         eventId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         eventDateTime: 2000-01-23T04:56:07.000+00:00
         accountName: accountName
-        sourceCurrency: sourceCurrency
+        sourceCurrency: EUR
         eventType: eventType
         accountNumber: accountNumber
         paymentAmount: 1299
@@ -16952,7 +16691,7 @@ components:
         scheduledFor: 2000-01-23T04:56:07.000+00:00
         sourceAmount: 1299
         scheduledBy: Aphra Behn
-        paymentCurrency: paymentCurrency
+        paymentCurrency: EUR
         scheduledAt: 2000-01-23T04:56:07.000+00:00
       properties:
         eventId:
@@ -16978,7 +16717,8 @@ components:
             ORCHESTRATED_PAYMENT_REQUESTED'
           type: string
         sourceCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -16988,7 +16728,8 @@ components:
           format: int64
           type: integer
         paymentCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -17024,6 +16765,39 @@ components:
         - eventDateTime
         - eventId
         - eventType
+      type: object
+    PostInstructFxInfo:
+      description: FX details relating to a payout that was executed or is still waiting
+        to be executed
+      example:
+        fxStatus: INITIATED
+        fxStatusUpdatedAt: 2000-01-23T04:56:07.000+00:00
+        fxTransactionReference: AB123GHI
+        fxMode: MANUAL
+      properties:
+        fxMode:
+          description: The mode by which the FX rate is to be determined (MANUAL or
+            AUTO)
+          example: MANUAL
+          type: string
+        fxStatus:
+          description: The state to which the Post-Instruct FX process has reached
+            (INITIATED or COMPLETED)
+          example: INITIATED
+          type: string
+        fxStatusUpdatedAt:
+          description: The date-time at which the most recent fxStatus was determined.
+          format: date-time
+          type: string
+        fxTransactionReference:
+          description: The reference assigned to the FX funding that will fulfil this
+            payment.
+          example: AB123GHI
+          type: string
+      required:
+        - fxMode
+        - fxStatus
+        - fxStatusUpdatedAt
       type: object
     PaymentDelta:
       example:
@@ -17069,39 +16843,52 @@ components:
     QuoteFxSummaryV3:
       example:
         invertedRate: 1.12
-        creationTime: 2000-01-23T04:56:07.000+00:00
-        rate: 1.12
-        expiryTime: 2000-01-23T04:56:07.000+00:00
+        creationTime: 2022-10-30T09:45:09Z
+        rate: 0.89
+        expiryTime: 2022-10-30T09:50:09Z
         sourceCurrency: USD
-        totalPaymentAmount: 1234
+        totalPaymentAmount: 890000
         paymentCurrency: USD
-        quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        totalSourceAmount: 1234
+        quoteId: af80d455-29dd-4e72-a000-495a9829a7d0
+        totalSourceAmount: 1000000
         fundingStatus: FUNDED
         status: QUOTED
       properties:
         rate:
-          example: 1.12
+          description: The conversion rate (from the source currency to the payment
+            currency)
+          example: 0.89
           format: float
           type: number
         invertedRate:
+          description: The inverse conversion rate (from paymnent currency to source
+            currency)
           example: 1.12
           format: float
           type: number
         creationTime:
+          description: Timestamp of when the quote was created
+          example: 2022-10-30T09:45:09Z
           format: date-time
           type: string
         expiryTime:
+          description: The timestamp for when the quote will expire
+          example: 2022-10-30T09:50:09Z
           format: date-time
           type: string
         quoteId:
+          description: The id of the created quote
+          example: af80d455-29dd-4e72-a000-495a9829a7d0
           format: uuid
           type: string
         totalSourceAmount:
-          example: 1234
+          description: The amount (in minor units) that will be paid from the source
+            account
+          example: 1000000
           type: integer
         totalPaymentAmount:
-          example: 1234
+          description: The amount (in minor units) that the payee will receive
+          example: 890000
           type: integer
         sourceCurrency:
           description: Valid ISO 4217 3 letter currency code. See the <a href="https://www.iso.org/iso-4217-currency-codes.html"
@@ -17144,15 +16931,18 @@ components:
       type: object
     SourceAccountV3:
       example:
-        sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        sourceAccountId: cf81e490-4ab8-49c2-bd68-9d1e725480cb
         currency: USD
-        totalPayoutCost: 1231200
+        totalPayoutCost: 1000000
         sourceAccountName: AccountName
       properties:
         sourceAccountName:
+          description: The name of the source account as referencec in the payout
           example: AccountName
           type: string
         sourceAccountId:
+          description: The id of the payout
+          example: cf81e490-4ab8-49c2-bd68-9d1e725480cb
           format: uuid
           type: string
         currency:
@@ -17165,7 +16955,9 @@ components:
           title: ISO Currency Code
           type: string
         totalPayoutCost:
-          example: 1231200
+          description: The total amount (in mnor units) that will be debited from
+            the source account for the payout
+          example: 1000000
           type: integer
       required:
         - currency
@@ -17176,17 +16968,20 @@ components:
     AcceptedPaymentV3:
       example:
         currencyType: USD
-        amount: 1234
+        amount: 10000
         paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-        payorPaymentId: paymenIdVal123123
-        railsId: WU
-        paymentMemo: Payment memo
-        remoteSystemId: Remote_System_Id_101234
-        remoteId: remoteIdVal123
-        sourceAccountName: Chase
+        payorPaymentId: 123211321ABSD
+        railsId: SVB
+        paymentMemo: INV00112
+        remoteSystemId: OB012
+        remoteId: remoteId1234
+        sourceAccountName: Chase Bank Account
       properties:
         remoteId:
-          example: remoteIdVal123
+          description: Your identifier for the payee
+          example: remoteId1234
+          maxLength: 100
+          minLength: 1
           type: string
         currencyType:
           description: Valid ISO 4217 3 letter currency code. See the <a href="https://www.iso.org/iso-4217-currency-codes.html"
@@ -17198,25 +16993,45 @@ components:
           title: ISO Currency Code
           type: string
         amount:
-          example: 1234
+          description: The amount of the payment in minor units
+          example: 10000
           type: integer
         sourceAccountName:
-          example: Chase
+          description: The identifier of the source account to debit the payment from
+          example: Chase Bank Account
           type: string
         payorPaymentId:
-          example: paymenIdVal123123
+          description: A reference identifier for the payor for the given payee payment
+          example: 123211321ABSD
+          maxLength: 40
+          minLength: 0
           type: string
         paymentMemo:
-          example: Payment memo
+          description: |
+            <p>Any value here will override the memo value in the parent payout</p>
+            <p>This should be the reference field on the statement seen by the payee (but not via ACH)</p>
+          example: INV00112
+          maxLength: 40
+          minLength: 0
           type: string
         remoteSystemId:
-          example: Remote_System_Id_101234
+          description: |
+            <p>The identifier for the remote payments system if not Velo</p>
+          example: OB012
+          maxLength: 100
+          minLength: 1
           type: string
         paymentMetadata:
+          description: |
+            <p>Metadata about the payment that may be relevant to the specific rails or remote system making the payout</p>
+            <p>The structure of the data will be dictated by the requirements of the payment rails</p>
           example: invoiceeId_123|abc001:12345|xyz002:4567
+          maxLength: 512
+          minLength: 0
           type: string
         railsId:
-          example: WU
+          description: Indicates the 3rd party system involved in making this payment
+          example: SVB
           type: string
       required:
         - amount
@@ -17230,18 +17045,19 @@ components:
       example:
         currencyType: USD
         reason: The payee has not been onboarded
-        amount: 1234
+        amount: 10000
         paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
-        payorPaymentId: paymenIdVal123123
-        reasonCode: PAYMENT_VALUE_TOO_HIGH
-        remoteSystemId: Remote_System_Id_101234
-        lineNumber: 10
+        payorPaymentId: 123211321ABSD
+        reasonCode: VE1012
+        remoteSystemId: OB012
+        lineNumber: 34
         message: Payment cannot be processed because of the Payee's OFAC or Compliance
           Status
         remoteId: remoteIdVal123
-        sourceAccountName: Chase
+        sourceAccountName: Chase Bank Account
       properties:
         remoteId:
+          description: The remoteId supplied by the payor that identifies the payee
           example: remoteIdVal123
           type: string
         currencyType:
@@ -17254,30 +17070,49 @@ components:
           title: ISO Currency Code
           type: string
         amount:
-          example: 1234
+          description: The amount of the payment in minor units
+          example: 10000
           type: integer
         sourceAccountName:
-          example: Chase
+          description: The identifier of the source account to debit the payment from
+          example: Chase Bank Account
           type: string
         payorPaymentId:
-          example: paymenIdVal123123
+          description: A reference identifier for the payor for the given payee payment
+          example: 123211321ABSD
+          maxLength: 40
+          minLength: 0
           type: string
         remoteSystemId:
-          example: Remote_System_Id_101234
+          description: |
+            <p>The identifier for the remote payments system if not Velo</p>
+          example: OB012
+          maxLength: 100
+          minLength: 1
           type: string
         paymentMetadata:
+          description: |
+            <p>Metadata about the payment that may be relevant to the specific rails or remote system making the payout</p>
+            <p>The structure of the data will be dictated by the requirements of the payment rails</p>
           example: invoiceeId_123|abc001:12345|xyz002:4567
+          maxLength: 512
+          minLength: 0
           type: string
         reason:
+          description: The reason for the payment being rejected
           example: The payee has not been onboarded
           type: string
         reasonCode:
-          example: PAYMENT_VALUE_TOO_HIGH
+          description: The reason code as determined by Velo
+          example: VE1012
           type: string
         lineNumber:
-          example: 10
+          description: If the payment was submitted in a csv payout then this will
+            be the line number of the payment in the file
+          example: 34
           type: integer
         message:
+          description: A more general rejection message than the reason property
           example: Payment cannot be processed because of the Payee's OFAC or Compliance
             Status
           type: string
@@ -17325,8 +17160,8 @@ components:
       type: object
     PaymentV3:
       example:
-        amount: 1234
-        paymentMemo: Payment memo
+        amount: 10000
+        paymentMemo: INV00112
         remoteId: remoteIdVal123
         payee:
           individual:
@@ -17336,59 +17171,86 @@ components:
           company:
             companyName: ACME Anvils PLC
           payeeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        paymentId: paymentId
+        paymentId: 859af785-223b-4d5b-a708-5fa57f006dbb
         withdrawable: false
         autoWithdrawnReasonCode: VE0003
         paymentMetadata: invoiceeId_123|abc001:12345|xyz002:4567
         currency: USD
-        payorPaymentId: paymenIdVal123123
-        transmissionType: transmissionType
-        railsId: WU
-        remoteSystemId: Remote_System_Id_101234
-        sourceAccountName: Chase
-        status: status
+        payorPaymentId: 123211321ABSD
+        transmissionType: LOCAL
+        railsId: SVB
+        remoteSystemId: OB012
+        sourceAccountName: Chase Bank Account
+        status: AWAITING_FUNDS
       properties:
         paymentId:
+          description: The id of the payment
+          example: 859af785-223b-4d5b-a708-5fa57f006dbb
+          format: uuid
           type: string
         remoteId:
+          description: The remoteId supplied by the payor that identifies the payee
           example: remoteIdVal123
           type: string
         currency:
+          description: The currency that the payment was made in
           example: USD
           maxLength: 3
           minLength: 3
           type: string
         amount:
-          example: 1234
+          description: The amount of the payment in minor units
+          example: 10000
           type: integer
         sourceAccountName:
-          example: Chase
+          description: The identifier of the source account to debit the payment from
+          example: Chase Bank Account
           type: string
         payorPaymentId:
-          example: paymenIdVal123123
+          description: A reference identifier for the payor for the given payee payment
+          example: 123211321ABSD
+          maxLength: 40
+          minLength: 0
           type: string
         paymentMemo:
-          example: Payment memo
+          description: |
+            <p>Any value here will override the memo value in the parent payout</p>
+            <p>This should be the reference field on the statement seen by the payee (but not via ACH)</p>
+          example: INV00112
+          maxLength: 40
+          minLength: 0
           type: string
         payee:
           $ref: '#/components/schemas/PayoutPayeeV3'
         withdrawable:
+          description: Can this paynent be withdrawn
           example: false
           type: boolean
         status:
           description: 'Current status of payment. One of the following values: SUBMITTED,
             ACCEPTED, REJECTED, WITHDRAWN, RETURNED, AWAITING_FUNDS, FUNDED, UNFUNDED,
-            CANCELLED, REQUESTED'
+            CANCELLED, BANK_PAYMENT_REQUESTED'
+          example: AWAITING_FUNDS
           type: string
         transmissionType:
           description: 'The transmission method of the payment. One of the following
             values: ACH, SAME_DAY_ACH, WIRE, LOCAL, SWIFT'
+          example: LOCAL
           type: string
         remoteSystemId:
-          example: Remote_System_Id_101234
+          description: |
+            <p>The identifier for the remote payments system if not Velo</p>
+          example: OB012
+          maxLength: 100
+          minLength: 1
           type: string
         paymentMetadata:
+          description: |
+            <p>Metadata about the payment that may be relevant to the specific rails or remote system making the payout</p>
+            <p>The structure of the data will be dictated by the requirements of the payment rails</p>
           example: invoiceeId_123|abc001:12345|xyz002:4567
+          maxLength: 512
+          minLength: 0
           type: string
         autoWithdrawnReasonCode:
           description: Populated only if the payment was automatically withdrawn during
@@ -17397,7 +17259,7 @@ components:
           type: string
         railsId:
           description: Indicates the 3rd party system involved in making this payment
-          example: WU
+          example: SVB
           type: string
       required:
         - paymentId
@@ -17409,6 +17271,8 @@ components:
           - displayName: Account Name
             minLength: 5
             displayOrder: 0
+            description: The bank branch, account number prefix and account number suffix;
+              with hyphen separators.
             required: true
             maxLength: 50
             validation: ^[0-9]{6,11}$
@@ -17416,6 +17280,8 @@ components:
           - displayName: Account Name
             minLength: 5
             displayOrder: 0
+            description: The bank branch, account number prefix and account number suffix;
+              with hyphen separators.
             required: true
             maxLength: 50
             validation: ^[0-9]{6,11}$
@@ -18243,7 +18109,7 @@ components:
     SourceAccountSummary:
       example:
         sourceAccountId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        currency: currency
+        currency: EUR
         totalCost: 3344
       properties:
         sourceAccountId:
@@ -18254,7 +18120,8 @@ components:
           format: int64
           type: integer
         currency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -18266,9 +18133,9 @@ components:
       example:
         invertedRate: 123.23
         rate: 123.23
-        sourceCurrency: sourceCurrency
+        sourceCurrency: EUR
         totalPaymentAmount: 34235
-        paymentCurrency: paymentCurrency
+        paymentCurrency: EUR
         quoteId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         totalCost: 5
         fundingStatus: fundingStatus
@@ -18295,12 +18162,14 @@ components:
           example: 34235
           type: integer
         sourceCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
         paymentCurrency:
-          description: ISO 3 character currency code
+          description: ISO-4217 3 character currency code
+          example: EUR
           maxLength: 3
           minLength: 3
           type: string
@@ -18326,6 +18195,15 @@ components:
       description: 'Current status of the payout schedule. One of the following values:
         SCHEDULED, EXECUTED, FAILED'
       example: SCHEDULED
+      type: string
+    PostInstructFxMode:
+      description: The mode by which the FX rate is to be determined (MANUAL or AUTO)
+      example: MANUAL
+      type: string
+    PostInstructFxStatus:
+      description: The state to which the Post-Instruct FX process has reached (INITIATED
+        or COMPLETED)
+      example: INITIATED
       type: string
     PayoutPayeeV3:
       description: Payee data associated with a payment. Either individual or company
@@ -18356,6 +18234,8 @@ components:
         displayName: Account Name
         minLength: 5
         displayOrder: 0
+        description: The bank branch, account number prefix and account number suffix;
+          with hyphen separators.
         required: true
         maxLength: 50
         validation: ^[0-9]{6,11}$
@@ -18388,6 +18268,12 @@ components:
           type: string
         displayOrder:
           type: integer
+        description:
+          description: An optional description, or hint, as to how the user should
+            enter the field value.
+          example: The bank branch, account number prefix and account number suffix;
+            with hyphen separators.
+          type: string
       required:
         - displayName
         - element
@@ -18922,7 +18808,29 @@ components:
         href:
           example: http://api.sandbox.velopayments.com/v4/payees/deltas?payorId=0a818933-087d-47f2-ad83-2f986ed087eb&updatedSince=2019-01-20T09:00:00+00:00&page=1&pageSize=1000
           type: string
-    ListSourceAccountResponse_page:
+    ListSourceAccountResponseV2_links:
+      example:
+        rel: first
+        href: https://api.sandbox.velopayments.com/v2/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+      properties:
+        rel:
+          example: first
+          type: string
+        href:
+          example: https://api.sandbox.velopayments.com/v2/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+          type: string
+    ListSourceAccountResponseV3_links:
+      example:
+        rel: first
+        href: https://api.sandbox.velopayments.com/v3/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+      properties:
+        rel:
+          example: first
+          type: string
+        href:
+          example: https://api.sandbox.velopayments.com/v3/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
+          type: string
+    ListFundingAccountsResponseV2_page:
       example:
         numberOfElements: 1
         totalPages: 2
@@ -18945,7 +18853,7 @@ components:
         pageSize:
           example: 25
           type: integer
-    ListSourceAccountResponse_links:
+    ListFundingAccountsResponseV2_links:
       example:
         rel: first
         href: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
@@ -18955,28 +18863,6 @@ components:
           type: string
         href:
           example: https://api.sandbox.velopayments.com/v1/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-          type: string
-    ListSourceAccountResponseV2_links:
-      example:
-        rel: first
-        href: https://api.sandbox.velopayments.com/v2/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-      properties:
-        rel:
-          example: first
-          type: string
-        href:
-          example: https://api.sandbox.velopayments.com/v2/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-          type: string
-    ListSourceAccountResponseV3_links:
-      example:
-        rel: first
-        href: https://api.sandbox.velopayments.com/v3/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
-      properties:
-        rel:
-          example: first
-          type: string
-        href:
-          example: https://api.sandbox.velopayments.com/v3/sourceAccounts?payorId=a2967711-df07-41e5-b5ea-f563088911c6&page=1&pageSize=0&sort=fundingRef:asc
           type: string
     GetFundingsResponse_links:
       example:
@@ -19342,7 +19228,9 @@ x-tagGroups:
   - name: Payor Operations
     tags:
       - Payors
-      - Funding Manager
+      - Payor Hierarchy
+      - Funding
+      - Source Accounts
       - Webhooks
       - Payins
   - name: Payee Operations
@@ -19350,9 +19238,9 @@ x-tagGroups:
       - Payees
       - Payee Invitation
       - Invites
-  - name: Payouts
+  - name: Payout APIs
     tags:
-      - Payout Service
+      - Payouts
   - name: Reporting
     tags:
       - Payment Audit Service
