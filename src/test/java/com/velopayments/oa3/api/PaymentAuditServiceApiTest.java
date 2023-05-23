@@ -83,7 +83,7 @@ public class PaymentAuditServiceApiTest {
 
             GetPaymentsForPayoutResponseV4 getPaymentsForPayoutResponseV4 = paymentAuditServiceApi.getPaymentsForPayoutV4(payoutSummaryAuditV3.getPayoutId(), null, null, null,
                     null, null, null, null, null, null,
-                    null, null, null, null, null);
+                    null, null, null, null, null, false);
 
             assertNotNull(getPaymentsForPayoutResponseV4);
             assertThat(getPaymentsForPayoutResponseV4.getContent().size()).isGreaterThan(0);
@@ -98,7 +98,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null, null, null);
+                    null, null, null, null, null, null, false);
 
             assertNotNull(listPaymentsResponse);
             assertThat(listPaymentsResponse.getContent().size()).isGreaterThan(0);
@@ -112,7 +112,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null, null, null);
+                    null, null, null, null, null, null, false);
 
             assertNotNull(listPaymentsResponse);
 
@@ -182,7 +182,7 @@ public class PaymentAuditServiceApiTest {
 
             GetPaymentsForPayoutResponseV4 getPaymentsForPayoutResponseV4 = paymentAuditServiceApi.getPaymentsForPayoutV4(payoutSummaryAuditV4.getPayoutId(), null, null, null,
                     null, null, null, null, null,
-                    null, null, null, null, null, null);
+                    null, null, null, null, null, null, false);
 
             assertNotNull(getPaymentsForPayoutResponseV4);
             assertThat(getPaymentsForPayoutResponseV4.getContent().size()).isGreaterThan(0);
@@ -196,7 +196,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null, null, null);
+                    null, null, null, null, null, null, false);
 
             assertNotNull(listPaymentsResponseV4);
             assertThat(listPaymentsResponseV4.getContent().size()).isGreaterThan(0);
@@ -210,7 +210,7 @@ public class PaymentAuditServiceApiTest {
                     null, null, null, null,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null, null, null, null, null);
+                    null, null, null, null, null, null, false);
 
             assertNotNull(listPaymentsResponseV4);
 

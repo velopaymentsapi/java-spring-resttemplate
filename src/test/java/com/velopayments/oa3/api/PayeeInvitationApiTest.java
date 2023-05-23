@@ -156,13 +156,14 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         CreatePayeesRequestV3 createPayeesRequestV3 = new CreatePayeesRequestV3();
         createPayeesRequestV3.setPayorId(veloAPIProperties.getPayorId());
         CreatePayeeV3 createPayeeV3 = new CreatePayeeV3();
-        createPayeeV3.setEmail("john.thompson+" + randomString + "@velopayments.com");
+        createPayeeV3.setEmail("britton.halle+" + randomString + "@velopayments.com");
         createPayeeV3.setRemoteId(randomString);
         createPayeeV3.setType("INDIVIDUAL");
 
         CreatePayeeAddressV3 createPayeeAddress = new CreatePayeeAddressV3();
         createPayeeAddress.setLine1("123 Main St");
         createPayeeAddress.setCity("St Petersburg");
+        createPayeeAddress.setCountyOrProvince("FL");
         createPayeeAddress.setCountry("US");
         createPayeeAddress.setZipOrPostcode("33701");
         createPayeeV3.setAddress(createPayeeAddress);
@@ -188,7 +189,7 @@ public class PayeeInvitationApiTest extends BaseApiTest {
         CreatePayeesRequestV4 createPayeesRequestV4 = new CreatePayeesRequestV4();
         createPayeesRequestV4.setPayorId(veloAPIProperties.getPayorId());
         CreatePayeeV4 createPayeeV4 = new CreatePayeeV4();
-        createPayeeV4.setEmail("john.thompson+" + randomString + "@velopayments.com");
+        createPayeeV4.setEmail("britton.halle+" + randomString + "@velopayments.com");
         createPayeeV4.setRemoteId(randomString);
         createPayeeV4.setType(PayeeTypeEnum.INDIVIDUAL);
 

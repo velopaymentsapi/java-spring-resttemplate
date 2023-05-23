@@ -32,6 +32,9 @@ public class PayorApiTest {
     PayorsApi payorsApi;
 
     @Autowired
+    PayorHierarchyApi payorHierarchyApi;
+
+    @Autowired
     VeloAPIProperties veloAPIProperties;
 
     @DisplayName("V1")
@@ -40,12 +43,12 @@ public class PayorApiTest {
         @DisplayName("Test Get Payor")
         @Test
         void testGetPayorV1() {
-            PayorV1 payorV1 = payorsApi.getPayorById(veloAPIProperties.getPayorIdUuid());
+            PayorV2 payorV2 = payorsApi.getPayorByIdV2(veloAPIProperties.getPayorIdUuid());
 
-            assertNotNull(payorV1);
-            assertNotNull(payorV1.getAddress());
-            assertNotNull(payorV1.getPrimaryContactEmail());
-            assertNotNull(payorV1.getLanguage());
+            assertNotNull(payorV2);
+            assertNotNull(payorV2.getAddress());
+            assertNotNull(payorV2.getPrimaryContactEmail());
+            assertNotNull(payorV2.getLanguage());
         }
 
         @DisplayName("Test Get Branding")
@@ -60,7 +63,7 @@ public class PayorApiTest {
         @DisplayName("Test Get Payor Links by Descendents")
         @Test
         void testGetPayorLinksDescendents() {
-            PayorLinksResponse payorLinksResponse = payorsApi.payorLinks(veloAPIProperties.getPayorIdUuid(), null, null);
+            PayorLinksResponse payorLinksResponse = payorHierarchyApi.payorLinksV1(veloAPIProperties.getPayorIdUuid(), null, null);
 
             assertNotNull(payorLinksResponse);
         }
@@ -68,7 +71,7 @@ public class PayorApiTest {
         @DisplayName("Test Get Payor Links py Parent")
         @Test
         void testGetPayorLinksParent() {
-            PayorLinksResponse payorLinksResponse = payorsApi.payorLinks(null, veloAPIProperties.getPayorIdUuid(), null);
+            PayorLinksResponse payorLinksResponse = payorHierarchyApi.payorLinksV1(null, veloAPIProperties.getPayorIdUuid(), null);
 
             assertNotNull(payorLinksResponse);
         }
@@ -83,7 +86,7 @@ public class PayorApiTest {
             payorCreateApplicationRequest.setDescription("SDK TestApp - " + randomString);
             payorCreateApplicationRequest.setName("SDK Test App Name - " + randomString);
 
-            ResponseEntity<Void> createResponse = payorsApi.payorCreateApplicationRequestWithHttpInfo(veloAPIProperties.getPayorIdUuid(), payorCreateApplicationRequest);
+            ResponseEntity<Void> createResponse = payorsApi.payorCreateApplicationV1WithHttpInfo(veloAPIProperties.getPayorIdUuid(), payorCreateApplicationRequest);
 
             assertEquals(201, createResponse.getStatusCode().value());
         }
@@ -120,7 +123,7 @@ public class PayorApiTest {
             payorCreateApplicationRequest.setDescription("SDK Test Descrip - " + randomString);
             payorCreateApplicationRequest.setName("SDK Test App Name - " + randomString);
 
-            ResponseEntity<Void> createResponse = payorsApi.payorCreateApplicationRequestWithHttpInfo(veloAPIProperties.getPayorIdUuid(), payorCreateApplicationRequest);
+            ResponseEntity<Void> createResponse = payorsApi.payorCreateApplicationV1WithHttpInfo(veloAPIProperties.getPayorIdUuid(), payorCreateApplicationRequest);
 
             assertEquals(201, createResponse.getStatusCode().value());
 
@@ -133,7 +136,7 @@ public class PayorApiTest {
             createApiKeyRequest.setName("SDK KeyName - " + randomString );
             createApiKeyRequest.setDescription("Set by SDK Test");
             createApiKeyRequest.setRoles(Arrays.asList(PayorCreateApiKeyRequest.RolesEnum.ADMIN, PayorCreateApiKeyRequest.RolesEnum.SUPPORT));
-            PayorCreateApiKeyResponse response = payorsApi.payorCreateApiKeyRequest(veloAPIProperties.getPayorIdUuid(), UUID.fromString(appUuid), createApiKeyRequest);
+            PayorCreateApiKeyResponse response = payorsApi.payorCreateApiKeyV1(veloAPIProperties.getPayorIdUuid(), UUID.fromString(appUuid), createApiKeyRequest);
 
             assertNotNull(response);
             assertNotNull(response.getApiKey());

@@ -151,9 +151,9 @@ public class VeloConfig {
 
     @Bean
     @Lazy
-    public FundingManagerApi fundingManagerApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+    public FundingApi fundingApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
                                                VeloAPIProperties veloAPIProperties){
-        return new FundingManagerApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
+        return new FundingApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
@@ -185,9 +185,21 @@ public class VeloConfig {
 
     @Bean
     @Lazy
-    public PayoutServiceApi payoutServiceApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
+    public PayorHierarchyApi payorHierarchyApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new PayorHierarchyApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
+    }
+
+    @Bean
+    @Lazy
+    public PayoutsApi payoutsApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService,
                                              VeloAPIProperties veloAPIProperties){
-        return new PayoutServiceApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
+        return new PayoutsApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
+    }
+
+    @Bean
+    @Lazy
+    public SourceAccountsApi sourceAccountsApi(RestTemplateBuilder restTemplateBuilder, VeloApiTokenService veloApiTokenService, VeloAPIProperties veloAPIProperties){
+        return new SourceAccountsApi(buildTokenApiClient(restTemplateBuilder, veloApiTokenService, veloAPIProperties));
     }
 
     @Bean
