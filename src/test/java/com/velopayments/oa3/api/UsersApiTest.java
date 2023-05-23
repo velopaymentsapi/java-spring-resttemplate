@@ -96,7 +96,7 @@ public class UsersApiTest {
         String randomString = RandomStringUtils.randomAlphabetic(10);
 
         InviteUserRequest inviteUserRequest = new InviteUserRequest();
-        inviteUserRequest.email("john.thompson+" + randomString + "@velopayments.com");
+        inviteUserRequest.email("britton.halle+" + randomString + "@velopayments.com");
         inviteUserRequest.setMfaType(InviteUserRequest.MfaTypeEnum.SMS);
         inviteUserRequest.setSmsNumber("+1727872100");
         inviteUserRequest.setPrimaryContactNumber("+1727872100");

@@ -43,12 +43,12 @@ public class PayorApiTest {
         @DisplayName("Test Get Payor")
         @Test
         void testGetPayorV1() {
-            PayorV1 payorV1 = payorsApi.getPayorByIdV1(veloAPIProperties.getPayorIdUuid());
+            PayorV2 payorV2 = payorsApi.getPayorByIdV2(veloAPIProperties.getPayorIdUuid());
 
-            assertNotNull(payorV1);
-            assertNotNull(payorV1.getAddress());
-            assertNotNull(payorV1.getPrimaryContactEmail());
-            assertNotNull(payorV1.getLanguage());
+            assertNotNull(payorV2);
+            assertNotNull(payorV2.getAddress());
+            assertNotNull(payorV2.getPrimaryContactEmail());
+            assertNotNull(payorV2.getLanguage());
         }
 
         @DisplayName("Test Get Branding")
